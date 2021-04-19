@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<moduleContext>
+    <conf>
+        <moduleName>SchemaWoz</moduleName>
+        <description>SchemaWoz</description>
+    </conf>
+    <remote name="ActionDecoder">
+        <group>robot</group>
+        <role>ActionDecoder</role>
+    </remote>
+    <remote name="ActionDecoderTree">
+        <group>robot</group>
+        <role>ActionDecoder</role>
+    </remote>
+</moduleContext>

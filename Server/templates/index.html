@@ -1,0 +1,460 @@
+{% extends "layout.html" %}
+{% block body %}
+<html lang=“ja”>
+<!-- <head>
+	<link rel="stylesheet" href="client_new.css">
+</head> -->
+<body>
+  <div class="box1">
+		<table border=2 align="center" width="1200">
+		<!-- <tr><td>
+        <p align="center">トピック</p>
+    </td></tr> -->
+		<tr><td>
+			{% if message %}
+					<form method="post" action="/send/change-topic/{{ message.topics[0] }}" style="display: inline">
+							<input type="submit" value={{ message.topics[0] }} class="buttonB" size="70">
+					</form>
+					<form method="post" action="/send/change-topic/{{ message.topics[1] }}" style="display: inline">
+							<input type="submit" value={{ message.topics[1] }} class="buttonB">
+					</form>
+					<form method="post" action="/send/change-topic/{{ message.topics[2] }}" style="display: inline">
+							<input type="submit" value={{ message.topics[2] }} class="buttonB">
+					</form>
+					<form method="post" action="/send/change-topic/{{ message.topics[3] }}" style="display: inline">
+							<input type="submit" value={{ message.topics[3] }} class="buttonB">
+					</form>
+					<form method="post" action="/send/change-topic/{{ message.topics[4] }}" style="display: inline">
+							<input type="submit" value={{ message.topics[4] }} class="buttonB">
+					</form>
+					<form method="post" action="/send/change-person/{{ message.person[0] }}" style="display: inline">
+							<input type="submit" value={{ message.person[0] }} class="buttonB">
+					</form>
+					<form method="post" action="/send/change-person/{{ message.person[1] }}" style="display: inline">
+							<input type="submit" value={{ message.person[1] }} class="buttonB">
+					</form>
+					<form method="post" action="/send/change-person/{{ message.person[2] }}" style="display: inline">
+							<input type="submit" value={{ message.person[2] }} class="buttonB">
+					</form>
+					<form method="post" action="/send/change-person/{{ message.person[3] }}" style="display: inline">
+							<input type="submit" value={{ message.person[3] }} class="buttonB">
+					</form>
+					<form method="post" action="/send/change-person/{{ message.person[4] }}" style="display: inline">
+							<input type="submit" value={{ message.person[4] }} class="buttonB">
+					</form>
+					<!-- <form method="post" action="/send/change-topic/{{ message.topics[10] }}" style="display: inline">
+							<input type="submit" value={{ message.topics[10] }} class="buttonB">
+					</form>
+					<form method="post" action="/send/change-topic/{{ message.topics[11] }}" style="display: inline">
+							<input type="submit" value={{ message.topics[11] }} class="buttonB">
+					</form> -->
+			{% else %}
+					<form method="post" action="/send/change-topic/topic1" style="display: inline">
+							<input type="submit" value="None" class="buttonB">
+					</form>
+					<form method="post" action="/send/change-topic/topic2" style="display: inline">
+							<input type="submit" value="None" class="buttonB">
+					</form>
+					<form method="post" action="/send/change-topic/topic3" style="display: inline">
+							<input type="submit" value="None" class="buttonB">
+					</form>
+					<form method="post" action="/send/change-topic/topic4" style="display: inline">
+							<input type="submit" value="None" class="buttonB">
+					</form>
+					<form method="post" action="/send/change-topic/topic5" style="display: inline">
+							<input type="submit" value="None" class="buttonB">
+					</form>
+					<form method="post" action="/send/change-topic/topic6" style="display: inline">
+							<input type="submit" value="None" class="buttonB">
+					</form>
+					<form method="post" action="/send/change-topic/topic7" style="display: inline">
+							<input type="submit" value="None" class="buttonB">
+					</form>
+					<form method="post" action="/send/change-topic/topic8" style="display: inline">
+							<input type="submit" value="None" class="buttonB">
+					</form>
+					<form method="post" action="/send/change-topic/topic9" style="display: inline">
+							<input type="submit" value="None" class="buttonB">
+					</form>
+					<form method="post" action="/send/change-topic/topic10" style="display: inline">
+							<input type="submit" value="None" class="buttonB">
+					</form>
+					<!-- <form method="post" action="/send/change-topic/topic11" style="display: inline">
+							<input type="submit" value="None" class="buttonB">
+					</form>
+					<form method="post" action="/send/change-topic/topic12" style="display: inline">
+							<input type="submit" value="None" class="buttonB"> -->
+					</form>
+			{% endif %}
+	</tr></td>
+		</table>
+	</div>
+	<div class="box2">
+		<table class="table2" border=2 align="center" width="330">
+		<tr><td>
+				<center id ='genre_btn'>
+					<input type="submit" value="ジャンル詳細" class='buttonG' id="genre_detail">
+
+				</center>
+		</td></tr>
+	</table>
+	</div>
+	<div id='genre'>
+		<table class="table2" border=2 align="center" height="50">
+		<tr><td>
+				<form method="post" action="/send/change-genre/SF" style="display: inline">
+						<input type="submit" value="SF" class="buttonE">
+				</form>
+				<form method="post" action="/send/change-genre/action" style="display: inline">
+						<input type="submit" value="アクション" class="buttonE">
+				</form>
+				<form method="post" action="/send/change-genre/horror" style="display: inline">
+						<input type="submit" value="ホラー" class="buttonE">
+				</form>
+				<form method="post" action="/send/change-genre/romance" style="display: inline">
+						<input type="submit" value="恋愛" class="buttonE">
+				</form>
+				<form method="post" action="/send/change-genre/human" style="display: inline">
+						<input type="submit" value="ヒューマン" class="buttonE">
+				</form>
+				<form method="post" action="/send/change-genre/anime" style="display: inline">
+						<input type="submit" value="アニメ" class="buttonE">
+				</form>
+				<form method="post" action="/send/change-genre/comedy" style="display: inline">
+						<input type="submit" value="コメディー" class="buttonE">
+				</form>
+				<form method="post" action="/send/change-genre/advenchar" style="display: inline">
+						<input type="submit" value="アドベンチャー" class="buttonE">
+				</form>
+				<form method="post" action="/send/change-genre/mistery" style="display: inline">
+						<input type="submit" value="ミステリー" class="buttonE">
+				</form>
+		</tr></td>
+		</table>
+	</div>
+
+
+	<div>
+		<div class="box4">
+			<table class="table2" border=2 align="right"  width="640">
+		    <tr><td>
+		        <p align="center">参加者 A</p>
+		    </td></tr>
+		    <tr><td>
+		        <form method="post" action="/send/look/A" style="display: inline">
+		            <input type="submit" value="Look" class="buttonD">
+		        </form>
+		        <form method="post" action="/send/nod/A" style="display: inline">
+		            <input type="submit" value="Nod" class="buttonD">
+		        </form>
+		        <form method="post" action="/send/start/A" style="display: inline">
+		            <input type="submit" value="開始" class="buttonA">
+		        </form>
+		        <form method="post" action="/send/summarize/A" style="display: inline">
+		            <input type="submit" value="まとめ" class="buttonA">
+		        </form>
+		        <form method="post" action="/send/end/A" style="display: inline">
+		            <input type="submit" value="終了" class="buttonA">
+		        </form>
+		    </td></tr>
+		    <tr><td>
+		        <form method="post" action="/send/recommendation-active/A" style="display: inline">
+		            <input type="submit" value="推薦" class="buttonC">
+		        </form>
+		        <form method="post" action="/send/detail-active/A" style="display: inline">
+		            <input type="submit" value="能動" class="buttonC">
+		        </form>
+		        <form method="post" action="/send/question/A" style="display: inline">
+		            <input type="submit" value="質問" class="buttonC">
+		        </form>
+		    </td></tr>
+		    <tr><td>
+		        <form method="post" action="/send/response-passive/A" style="display: inline">
+		            <input type="submit" value="応答" class="buttonF">
+		        </form>
+		        <form method="post" action="/send/yes-correction/A" style="display: inline">
+		            <input type="submit" value="Yes" class="buttonE">
+		        </form>
+		        <form method="post" action="/send/no-correction/A" style="display: inline">
+		            <input type="submit" value="No" class="buttonE">
+		        </form>
+						<form method="post" action="/send/unknown-correction/A" style="display: inline">
+								<input type="submit" value="不明" class="buttonE">
+						<form method="post" action="/send/repeat-correction/A" style="display: inline">
+								<input type="submit" value="繰り返し" class="buttonE">
+						</form>
+						<!-- </form>
+							<input type="submit" id='errorA' value="訂正" class="buttonE"> -->
+	    	</td></tr>
+				<tr><td>
+		        <form method="post" action="/send/title-correction/A" style="display: inline">
+		            <input type="submit" value="タイトル" class="buttonE">
+		        </form>
+		        <form method="post" action="/send/genre-correction/A" style="display: inline">
+		            <input type="submit" value="ジャンル" class="buttonE">
+		        </form>
+						<form method="post" action="/send/recommendation-correction/A" style="display: inline">
+		            <input type="submit" value="推薦" class="buttonE">
+		        </form>
+						<form method="post" action="/send/cast_detail-correction/A" style="display: inline">
+								<input type="submit" value="俳優詳細" class="buttonE">
+						</form>
+						<form method="post" action="/send/director_detail-correction/A" style="display: inline">
+								<input type="submit" value="監督詳細" class="buttonE">
+						</form>
+		    </td></tr>
+		    <tr><td>
+						<input type="submit" id='tipsA' value="Tips" class="buttonE">
+						<form method="post" action="/send/review-correction/A" style="display: inline">
+								<input type="submit" value="レビュー" class="buttonE">
+						</form>
+		        <form method="post" action="/send/evaluation-correction/A" style="display: inline">
+		            <input type="submit" value="評価" class="buttonE">
+		        </form>
+		        <form method="post" action="/send/cast-correction/A" style="display: inline">
+		            <input type="submit" value="出演者" class="buttonE">
+		        </form>
+		        <form method="post" action="/send/director-correction/A" style="display: inline">
+		            <input type="submit" value="監督" class="buttonE">
+		        </form>
+		    </td></tr>
+			</table>
+		</div>
+
+
+	  <div class="box3">
+			<table class="table2" border=2 align="left" height="330" width="640">
+		    <tr><td>
+		        <p align="center">参加者B</p>
+		    </td></tr>
+		    <tr><td>
+		        <form method="post" action="/send/look/B" style="display: inline">
+		            <input type="submit" value="Look" class="buttonD">
+		        </form>
+		        <form method="post" action="/send/nod/B" style="display: inline">
+		            <input type="submit" value="Nod" class="buttonD">
+		        </form>
+		        <form method="post" action="/send/start/B" style="display: inline">
+		            <input type="submit" value="開始" class="buttonA">
+		        </form>
+		        <form method="post" action="/send/summarize/B" style="display: inline">
+		            <input type="submit" value="まとめ" class="buttonA">
+		        </form>
+		        <form method="post" action="/send/end/B" style="display: inline">
+		            <input type="submit" value="終了" class="buttonA">
+		        </form>
+		    </td></tr>
+		    <tr><td>
+		        <form method="post" action="/send/recommendation-active/B" style="display: inline">
+		            <input type="submit" value="推薦" class="buttonC">
+		        </form>
+		        <form method="post" action="/send/detail-active/B" style="display: inline">
+		            <input type="submit" value="能動" class="buttonC">
+		        </form>
+		        <form method="post" action="/send/question/B" style="display: inline">
+		            <input type="submit" value="質問" class="buttonC">
+		        </form>
+		    </td></tr>
+		    <tr><td>
+		        <form method="post" action="/send/response-passive/B" style="display: inline">
+		            <input type="submit" value="応答" class="buttonF">
+		        </form>
+		        <form method="post" action="/send/yes-correction/B" style="display: inline">
+		            <input type="submit" value="Yes" class="buttonE">
+		        </form>
+		        <form method="post" action="/send/no-correction/B" style="display: inline">
+		            <input type="submit" value="No" class="buttonE">
+		        </form>
+						<form method="post" action="/send/unknown-correction/B" style="display: inline">
+								<input type="submit" value="不明" class="buttonE">
+						</form>
+						<form method="post" action="/send/repeat-correction/B" style="display: inline">
+								<input type="submit" value="繰り返し" class="buttonE">
+						</form>
+						<!-- <input type="submit" id='errorB' value="訂正" class="buttonE"> -->
+		    </td></tr>
+				<tr><td>
+		        <form method="post" action="/send/title-correction/B" style="display: inline">
+		            <input type="submit" value="タイトル" class="buttonE">
+		        </form>
+		        <form method="post" action="/send/genre-correction/B" style="display: inline">
+		            <input type="submit" value="ジャンル" class="buttonE">
+		        </form>
+						<form method="post" action="/send/recommendation-correction/B" style="display: inline">
+		            <input type="submit" value="推薦" class="buttonE">
+		        </form>
+						<form method="post" action="/send/cast_detail-correction/B" style="display: inline">
+								<input type="submit" value="俳優詳細" class="buttonE">
+						</form>
+						<form method="post" action="/send/director_detail-correction/B" style="display: inline">
+								<input type="submit" value="監督詳細" class="buttonE">
+						</form>
+
+		    </td></tr>
+		    <tr><td>
+						<input type="submit" id='tipsB' value="Tips" class="buttonE">
+						<form method="post" action="/send/review-correction/B" style="display: inline">
+								<input type="submit" value="レビュー" class="buttonE">
+						</form>
+		        <form method="post" action="/send/evaluation-correction/B" style="display: inline">
+		            <input type="submit" value="評価" class="buttonE">
+		        </form>
+		        <form method="post" action="/send/cast-correction/B" style="display: inline">
+		            <input type="submit" value="出演者" class="buttonE">
+		        </form>
+		        <form method="post" action="/send/director-correction/B" style="display: inline">
+		            <input type="submit" value="監督" class="buttonE">
+		        </form>
+		    </td></tr>
+		</table>
+	</div>
+
+</div>
+<div>
+	<!-- <div class="box5" height='200px'>
+		<left>
+			<input type="button"  value="誤り訂正発話A">
+		</left>
+		<right>
+			<input type="button"  value="誤り訂正発話B">
+		</right>
+	</div> -->
+	<div class="box7" id='tips_typeA'>
+		<table class="table3" border=2 align="left" >
+		<tr><td>
+        <form method="post" action="/send/tips-overview-correction/A" style="display: inline">
+            <input type="submit" value="あらすじ" class="buttonE" style="font-size:20px;">
+        </form>
+        <form method="post" action="/send/tips-series-correction/A" style="display: inline">
+            <input type="submit" value="シリーズ" class="buttonE" style="font-size:20px;">
+        </form>
+        <form method="post" action="/send/tips-others-correction/A" style="display: inline">
+            <input type="submit" value="その他" class="buttonE" style="font-size:20px;">
+        </form>
+    </td></tr>
+		</table>
+	</div>
+
+	<div class="box8" id='tips_typeB'>
+		<table class="table3" border=2 align="right" >
+		<tr><td>
+        <form method="post" action="/send/tips-overview-correction/B" style="display: inline">
+            <input type="submit" value="あらすじ" class="buttonE" style="font-size:20px;">
+        </form>
+        <form method="post" action="/send/tips-series-correction/B" style="display: inline">
+            <input type="submit" value="シリーズ" class="buttonE" style="font-size:20px;">
+        </form>
+        <form method="post" action="/send/tips-others-correction/B" style="display: inline">
+            <input type="submit" value="その他" class="buttonE" style="font-size:20px;">
+        </form>
+    </td></tr>
+		</table>
+	</div>
+
+    <!--<tr><td>
+				<form method="post" action="/send/review-correction/B" style="display: inline">
+						<input type="submit" value="レビュー" class="buttonE">
+				</form>
+        <form method="post" action="/send/recommendation-correction/B" style="display: inline">
+            <input type="submit" value="推薦" class="buttonE">
+        </form>
+        <form method="post" action="/send/evaluation-correction/B" style="display: inline">
+            <input type="submit" value="評価" class="buttonE">
+        </form>
+        <form method="post" action="/send/cast-correction/B" style="display: inline">
+            <input type="submit" value="出演者" class="buttonE">
+        </form>
+        <form method="post" action="/send/director-correction/B" style="display: inline">
+            <input type="submit" value="監督" class="buttonE">
+        </form>
+
+    </td></tr>
+		<tr><td>
+			<form method="post" action="/send/cast_detail-correction/B" style="display: inline">
+					<input type="submit" value="俳優詳細" class="buttonE">
+			</form>
+			<form method="post" action="/send/director_detail-correction/B" style="display: inline">
+					<input type="submit" value="監督詳細" class="buttonE">
+			<form method="post" action="/send/unknown-correction/B" style="display: inline">
+					<input type="submit" value="不明" class="buttonE">
+			</form>
+			<form method="post" action="/send/repeat-correction/B" style="display: inline">
+					<input type="submit" value="繰り返し" class="buttonE">
+			</form>
+		</td></tr>
+	</table>
+	</div>
+
+		<div class='box8' id='correctA'>
+			<table class="table4" border=2 align="left" >
+    <tr><td>
+        <form method="post" action="/send/yes-correction/A" style="display: inline">
+            <input type="submit" value="Yes" class="buttonE">
+        </form>
+        <form method="post" action="/send/no-correction/A" style="display: inline">
+            <input type="submit" value="No" class="buttonE">
+        </form>
+        <form method="post" action="/send/title-correction/A" style="display: inline">
+            <input type="submit" value="タイトル" class="buttonE">
+        </form>
+        <form method="post" action="/send/genre-correction/A" style="display: inline">
+            <input type="submit" value="ジャンル" class="buttonE">
+        </form>
+        <form method="post" action="/send/tips-correction/A" style="display: inline">
+            <input type="submit" value="Tips" class="buttonE">
+        </form>
+
+    </td></tr>
+    <tr><td>
+				<form method="post" action="/send/review-correction/A" style="display: inline">
+						<input type="submit" value="レビュー" class="buttonE">
+				</form>
+        <form method="post" action="/send/recommendation-correction/A" style="display: inline">
+            <input type="submit" value="推薦" class="buttonE">
+        </form>
+        <form method="post" action="/send/evaluation-correction/A" style="display: inline">
+            <input type="submit" value="評価" class="buttonE">
+        </form>
+        <form method="post" action="/send/cast-correction/A" style="display: inline">
+            <input type="submit" value="出演者" class="buttonE">
+        </form>
+        <form method="post" action="/send/director-correction/A" style="display: inline">
+            <input type="submit" value="監督" class="buttonE">
+        </form>
+
+    </td></tr>
+		<tr><td>
+			<form method="post" action="/send/cast_detail-correction/A" style="display: inline">
+					<input type="submit" value="俳優詳細" class="buttonE">
+			</form>
+			<form method="post" action="/send/director_detail-correction/A" style="display: inline">
+					<input type="submit" value="監督詳細" class="buttonE">
+			<form method="post" action="/send/unknown-correction/A" style="display: inline">
+					<input type="submit" value="不明" class="buttonE">
+			</form>
+			<form method="post" action="/send/repeat-correction/A" style="display: inline">
+					<input type="submit" value="繰り返し" class="buttonE">
+			</form>
+		</td></tr>
+	</div>
+	</table>
+	</div>
+</div>
+	<br>
+	<div class="save">
+	<p class="content_bottom">
+			<center>
+			<form method="post" action="/terminate">
+					<input type="text" style="width:500px;height:50px;font-size:35px;" name="message" placeholder="(拡張子なし)ファイル名" cols="30" rows="10">
+					<input type="submit" value="保存" class="buttonF">
+			</form>
+			</center>
+	</p>
+	</div> -->
+
+<!-- <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script> -->
+
+	<!-- <script src="./script0227.js"></script> -->
+
+</body>
+{% endblock %}

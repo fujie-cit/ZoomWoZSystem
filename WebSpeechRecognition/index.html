@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>Web音声認識</title>
+
+  <script src="assets/lib_js/jquery-3.3.1.min.js" ></script>
+  <script src="assets/bootstrap/js/bootstrap.js" ></script>
+  <script src="/socket.io/socket.io.js"></script> <!-- socket.io を読み込み -->
+  <script src="assets/js/speech_recognition.js"></script> <!-- メインロジック -->
+
+  <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+  <link rel="stylesheet" href="assets/bootstrap/css/bootstrap-grid.min.css">
+  <link rel="stylesheet" href="assets/bootstrap/css/bootstrap-reboot.min.css">
+
+  <style>
+      .row { margin-top: 20px;}
+  </style>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-sm-12">
+            <h3>Web音声認識</h3>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-5">
+            <button class="btn btn-primary" id="usr_A_btn">ユーザA</button> <!-- ユーザA選択ボタン -->
+            <button class="btn btn-primary" id="usr_B_btn">ユーザB</button> <!-- ユーザB選択ボタン -->
+        </div>
+        <div class="col-sm-7 d-flex align-items-center">
+            <strong><span id="usr" style="font-size: 24px">ユーザを選択してください</span></strong> <!-- ユーザ 表示 -->
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-5">
+            <button class="btn btn-primary" id="start_btn">音声認識開始</button> <!-- 音声認識開始ボタン -->
+            <button class="btn btn-secondary" id="end_btn">停止</button> <!-- 音声認識停止ボタン -->
+        </div>
+        <div class="col-sm-7 d-flex align-items-center">
+            <strong><span id="status" style="font-size: 24px"></span></strong> <!-- 音声認識 ON/OFF 表示 -->
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card-text">
+                <span id="prosess"></span> <!-- 音声認識イベント表示 -->
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="card-text" id="content"></div> <!-- 認識したテキスト表示 -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

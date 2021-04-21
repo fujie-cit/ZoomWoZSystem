@@ -51,7 +51,7 @@ class RobotController:
 
     def look(self, target):
         # TODO: ロボット画像(アニメーション)の視線変更
-        print('命令文: look, target: {}'.format(str(target)))
+        # print('命令文: look, target: {}'.format(str(target)))
         # self.logger.stamp('look', 'NONE', target, 'NONE')
         topics = self.dialog_manager.logger.get_topic_history()
         persons = self.dialog_manager.logger.get_person_history()

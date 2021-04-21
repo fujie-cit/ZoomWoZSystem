@@ -1,6 +1,7 @@
 const socket = io.connect();                  // ソケットio
 const speech = new webkitSpeechRecognition(); // 音声認識APIの使用
-speech.lang = "ja";                           // 言語を日本語に設定
+speech.lang = "ja";
+speech.interimResults = true                      // 言語を日本語に設定
 let keep_standby = false;
 let usr = None;
 
@@ -51,7 +52,7 @@ $(function () {
     $("#usr_B_btn").on('click', () => {
         update_usr('<span class="text-success">ユーザBを選択しています</span>');
         usr = B;
-        
+
     });
 
     $("#end_btn").trigger('click'); // 初期

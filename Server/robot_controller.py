@@ -7,9 +7,11 @@ __editor__ = "Hayato Katayama"
 import os.path
 import sys
 from STT import STT
+from TTS import TTS
 from NLG import NLG
 from DM import DM
 import configparser
+import threading
 
 os.environ["REGISTRY_SERVER_PORT"] = "25001"
 
@@ -26,6 +28,7 @@ class RobotController:
         self.config = configparser.ConfigParser()
         self.config.read('config.ini', encoding='utf-8')
         self.stt = STT()
+        self.tts = TTS(self.config)
         self.nlg = NLG(self.config)
         self.dialog_manager = DM(self.config)
 
@@ -338,16 +341,8 @@ class RobotController:
             sys.stdout.write(END)
 
         # TODO: 音声合成
-        # if utterance != '':
-        #     order = '{ln_and_speak['+utterance+']}[t='+target+', d=300]'
-        #     print('命令文:'+order)
-        #     self.set_utterance(utterance)
-        #     self.send_message(order)
-        #     self.logger.stamp(message, topic, target, utterance)
-        # else:
-        #     print("Utterance is none::" + message)
-        #     self.send_message(order)
-        #     self.logger.stamp(message, topic, target, utterance)
+        thread = threading.Thread(target=self.tts.main, args=([utterance]))
+        thread.start()
 
         # 発話ログ
         self.dialog_manager.logger.write_asr_log("U", utterance)

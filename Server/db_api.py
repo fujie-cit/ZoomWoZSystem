@@ -25,25 +25,25 @@ class DB_API():
 
     def search_movie(self):
         sql_order = "SELECT * FROM main"
-        columns = ["movie_id", "title", "evaluation", "vote", "popularity", "date"]
+        columns = ["movie_id", "title", "pronounciation", "evaluation", "vote", "popularity", "date"]
         df = self.sql_execute(sql_order, columns=columns)
         return df
 
     def search_movie_by_id(self, movie_id):
         sql_order = "SELECT * FROM main WHERE movie_id = '{}'".format(movie_id)
-        columns = ["movie_id", "title", "evaluation", "vote", "popularity", "date"]
+        columns = ["movie_id", "title", "pronounciation", "evaluation", "vote", "popularity", "date"]
         df = self.sql_execute(sql_order, columns=columns)
         return df
 
     def search_movie_by_title(self, title):
         sql_order = "SELECT * FROM main WHERE title LIKE '%{}%'".format(title)
-        columns = ["movie_id", "title", "evaluation", "vote", "popularity", "date"]
+        columns = ["movie_id", "title", "pronounciation", "evaluation", "vote", "popularity", "date"]
         df = self.sql_execute(sql_order, columns=columns)
         return df
 
     def search_movie_by_genre(self, genre_id):
         sql_order = "SELECT * FROM main WHERE movie_id = ANY (SELECT movie_id FROM genre WHERE genre_id = '{}')".format(genre_id)
-        columns = ["movie_id", "title", "evaluation", "vote", "popularity", "date"]
+        columns = ["movie_id", "title", "pronounciation", "evaluation", "vote", "popularity", "date"]
         df = self.sql_execute(sql_order, columns=columns)
         return df
 
@@ -52,7 +52,7 @@ class DB_API():
             sql_order = "SELECT * FROM main WHERE movie_id = ANY (SELECT movie_id FROM crew WHERE person_id = '{}')".format(person_id)
         else:
             sql_order = "SELECT * FROM main WHERE movie_id = ANY (SELECT movie_id FROM crew WHERE person_id = '{}' and job_id = '{}')".format(person_id, job_id)
-        columns = ["movie_id", "title", "evaluation", "vote", "popularity", "date"]
+        columns = ["movie_id", "title", "pronounciation", "evaluation", "vote", "popularity", "date"]
         df = self.sql_execute(sql_order, columns=columns)
         return df
 

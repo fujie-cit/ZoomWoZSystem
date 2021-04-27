@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "sincere-stack-307000",
+  "private_key_id": "708764b1979cc9cda64fc05c42dc500163791daf",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDGzqiM+KyysQ18\nBStXDQ2bj6TRZomFX5Fo4xJhZnFkYupADdx8bSzreDPbPhqwyX4n0Wn9gSncmaP3\n8I6RX3XgLM0L8Tt5WsNHZESpIu9nRdFnsFuzxXOpg2pq45ECayKdUfs4NtkfK7VD\ngaZm+Abhmo/WNZdEa0P4GrpIgjubKeHTMMQGCMmj107xcJqSHP8N3YVjRAUxubrM\nkVx/3ZO0mBJWX1fSv1Wo5zfLEIP/F7bahfhA9eP9yBFYmUOtfmVqikDQqkmoHd9X\nlOAvxk/J0pUkCKXcb0WPduOvS1jLkxv9mMguAp4Ff1MB1q1kIZ0MOModn/rGt558\noxYxygP9AgMBAAECggEABr65Mjs3pMJkCjqkq0nqlcYMWfxoGwnQhaX6mCphG35N\no0m1GtWbagvEeqJDRo83hANTXMH2mSDvUrirJZx/A9GRTV/sXCQrru7kc3aXd8ID\nJkjx+4nt8Cjgweqhn1riLEM9Sj12JVwWxMkPy7uLhDj5u1NLJAudnTvO6Snd+tgk\nCHifb9DMgF7aRtWvfH6Z/r+nwud711nrkmZIuWm/FjgT51W3hxbg1s+Zek03f198\n8b8vZiWYmSoXyr3nl+pcJ28a9wemJJEUFUrPFGdcCAerQDmM1ET6NKNCvm7MNHKc\nq4ij/4WBWiCFSQkuH+VJPBoQ0l7EGDsjWPk7RWk5EwKBgQD6cduGxWI09IWigtNj\n21zQUx6s2sJnY6NVeUvLxy5Ewzzk1LRqJ6k/4qeuKCYMT0hyyWvHbOndlGSYSzuw\nmzfVUEPUla+nge/SfsiSCZi+7P1sMxNXPUuE1fmjArPkQZhPUhYj1Drerbd/EGfA\n7amXjALihkYAJcOM8yBwHZZ0awKBgQDLN5Q6YZwCcgbvTaH0bwMiT/ELAzXx/KEG\nl0ZbZEuLgdSDwHWUZ4N4bBsByjYw7Tw0F/7UZSx27MqyAUD7k3YMLtqrTuJR/b4Q\nt/9TBJDgUVMy+FmGXf8HLFbPw2Ih5vin7O2Y/cm4Ib1rG3YLIx9Lvs8KmWnt2WZU\nasKxSb1DNwKBgEP6tcjOOQsAuGlVM4XuXDIb7b6jnpMrw4EG7KECjreReyzt447Q\n9yrlHfiy4ykCODsYG05FbPF9PxTrjucwKqaXI+JHQyenqG4thcnGGxTwBRXig0Rx\n2dbTsfAiYqv5dhtJv8K378bTxnQSAuemWxtMoNfV9JhDp+HReKOWFGnDAoGAfSEx\n8mjcCV1xC7T/vmUExwH2aFOHygNGm6pWNjwhkDtXQfEl9UVv3JykXIvIpoPNiD4m\nOV467NeNT+IZw07fZ00KdGVUUiwt9ll1rAaptpYc5supRGVofWA97BxgtoNkJPJs\nssHCjdCos+Tq4Jy1zowlLF+erEgrDFvYmhXPpi0CgYBl7eN3kieXhHYCZd1eGeFd\nGNThrUH30CuS6/sL17/cCSS9UYyboi7qoUsUENkbTPcotqbrF8I5ipf5BbnEbvpw\nz8DqClAiWlWbHSwVskxCBous1K3AG8+V954fUiV6K9m7oSaM8uaN6ozAZYAoq6D9\n5tcu7JMe6jS4hzsX74YLEA==\n-----END PRIVATE KEY-----\n",
+  "client_email": "zoomwozsystem@sincere-stack-307000.iam.gserviceaccount.com",
+  "client_id": "100285011296828216640",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/zoomwozsystem%40sincere-stack-307000.iam.gserviceaccount.com"
+}

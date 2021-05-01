@@ -86,7 +86,6 @@ def push_button(command, detail):
     message_dic['topics'] = topics
     message_dic['person'] = persons
 
-    print(message_dic['person'])
     # active = '監督'
     return render_template('index.html', message=message_dic)
 

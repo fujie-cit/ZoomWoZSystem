@@ -1,8 +1,12 @@
 from google.cloud import texttospeech
 import os
-from playsound import playsound
+import pyaudio
 
-os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'sincere-stack-307000-708764b1979c.json'
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'config/sincere-stack-307000-836c8778a98c.json'
+CHUNK = 1024
+WIDTH = 2
+CHANNEL = 1
+RATE = 24000
 
 
 class TTS():
@@ -25,7 +29,7 @@ class TTS():
 
         # オーディオ設定の生成
         audio_config = texttospeech.AudioConfig(
-            audio_encoding=texttospeech.AudioEncoding.MP3,
+            audio_encoding=texttospeech.AudioEncoding.LINEAR16,
             speaking_rate=1.1
         )
 
@@ -36,13 +40,15 @@ class TTS():
             audio_config=audio_config
         )
 
-        # レスポンスをファイル出力
-        with open(self.path, "wb") as out:
-            out.write(response.audio_content)
+        p = pyaudio.PyAudio()
+        stream = p.open(format=p.get_format_from_width(WIDTH),
+                        channels=CHANNEL,
+                        rate=RATE,
+                        output=True)
 
-    def play(self):
-        playsound(self.path)
+        if response.audio_content != '':
+            stream.write(response.audio_content)
 
-    def main(self, text):
-        self.generate(text)
-        self.play()
+        stream.stop_stream()
+        stream.close()
+        p.terminate()

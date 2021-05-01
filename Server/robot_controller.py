@@ -26,7 +26,7 @@ END = '\033[0m'
 class RobotController:
     def __init__(self):
         self.config = configparser.ConfigParser()
-        self.config.read('config.ini', encoding='utf-8')
+        self.config.read('config/config.ini', encoding='utf-8')
         self.stt = STT()
         self.tts = TTS(self.config)
         self.nlg = NLG(self.config)
@@ -341,7 +341,7 @@ class RobotController:
             sys.stdout.write(END)
 
         # TODO: 音声合成
-        thread = threading.Thread(target=self.tts.main, args=([utterance]))
+        thread = threading.Thread(target=self.tts.generate, args=([utterance]))
         thread.start()
 
         # 発話ログ

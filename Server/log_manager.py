@@ -78,7 +78,7 @@ class LogManager:
         self.csv.to_csv(df_main, self.path_main_log)
 
     def read(self, path):
-        df_log = pd.read_csv(path)
+        df_log = pd.read_csv(path, encoding="utf-8-sig")
         return df_log
 
     def get_intoduced_list(self, command, id):

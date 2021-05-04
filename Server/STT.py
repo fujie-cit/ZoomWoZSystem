@@ -9,6 +9,7 @@ class STT(threading.Thread):
         self.sio = socketio.Client()
 
     def run(self):
+        # self.sio.connect('http://localhost:9001')
         self.sio.connect('http://34.82.235.69:9001')
 
         @self.sio.event

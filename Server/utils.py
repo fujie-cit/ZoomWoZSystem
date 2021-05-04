@@ -15,7 +15,7 @@ class CSVProcessing:
         return data
 
     def write(self, path, data):
-        f = open(path, 'a')
+        f = open(path, 'a', encoding="utf_8_sig")
         writer = csv.writer(f, lineterminator='\n')
         writer.writerow(data)
         f.close()

@@ -15,6 +15,8 @@ const io = socketIO(server);
 const io2 = require('socket.io')(PORT2);
 var io2_flg = true;
 
+console.log('スタート');
+
 io2.on('connection', function ( socket2 ) {
   console.log('接続完了');
   socket2.emit('on_server_to_client', {word: '接続完了'});

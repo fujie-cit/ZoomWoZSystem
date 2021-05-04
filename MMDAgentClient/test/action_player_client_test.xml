@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<moduleContext>
+
+  <conf>
+    <moduleName>ActionPlayerClientTest</moduleName>
+    <description></description>
+  </conf>
+
+  <local>
+  </local>
+
+  <remote name="action_player">
+    <group>robot</group>
+    <role>actionPlayer</role>
+  </remote>
+
+  <remote name="speech_synthesizer">
+    <group>SpeechSynthesis</group>
+    <role>SpeechSynthesizer</role>
+  </remote>
+  
+</moduleContext>

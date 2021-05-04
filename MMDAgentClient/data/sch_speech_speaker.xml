@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<moduleContext>
+
+  <conf>
+    <moduleName>SchemaSpeechSpeaker</moduleName>
+    <port>9032</port>
+    <multicast>2005</multicast>
+  </conf>
+
+  <local>
+    <property name="status">
+      <description>current status</description> 
+      <value>0</value> 
+    </property>
+    
+    <property name="cacheSize">
+      <description>current cache size</description>
+      <value>0</value> 
+    </property>
+    
+    <method name="play">
+      <description>speak given content</description>
+      <param name="text">
+	<description>speech content as text</description>
+      </param>
+      <param name="data">
+        <description>speech sample</description>
+      </param>
+      <param name="duration">
+	<description>duration information</description>
+      </param>
+    </method>
+
+    <method name="replay">
+      <description>replay cached speech data</description>
+      <param name="text">
+	<description>text corresponding to speech content</description>
+      </param>
+    </method>
+
+    <method name="stop">
+      <description>stop current playing</description>
+    </method>
+
+    <method name="clearCache">
+      <description>clear cache explicitly</description>
+    </method>
+  </local>
+
+  <disclosure>
+    <group>SpeechSynthesis</group>
+    <role>Speaker</role>
+    <propertyRef name="status"/>
+    <propertyRef name="cacheSize"/>
+  </disclosure>
+
+</moduleContext>

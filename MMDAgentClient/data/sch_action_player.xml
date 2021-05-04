@@ -1,0 +1,155 @@
+<?xml version="1.0"?>
+<moduleContext>
+
+  <conf>
+    <moduleName>SchemaActionPlayer</moduleName>
+    <description></description>
+  </conf>
+
+  <local>
+    <property name="Status">
+      <description></description> 
+    </property>
+    <property name="Eye_R_Y">
+      <description>右目の絶対角度(ヨー)</description>
+      <value>0</value>
+    </property>
+    <property name="Eye_L_Y">
+      <description>左目の絶対角度(ヨー)</description>
+      <value>0</value>
+    </property>
+    <property name="Eye_R_P">
+      <description>右目の絶対角度(ピッチ)</description>
+      <value>0</value>
+    </property>
+    <property name="Eye_L_P">
+      <description>左目の絶対角度(ピッチ)</description>
+      <value>0</value>
+    </property>
+    <property name="Nec_P">
+      <description>首の絶対角度(ピッチ)</description>
+      <value>0</value>
+    </property>
+    <property name="Nec_Y">
+      <description>首の絶対角度(ヨー)</description>
+      <value>0</value>
+    </property>
+    <property name="CheckTime">
+      <description>モーターー角度取得時の時間(ロボットの起動開始を0とする 単位ms)</description>
+      <value>0</value>
+    </property>
+    <property name="CheckResponse">
+    </property>
+    <property name="CheckResponseId">
+    </property>
+    <property name="ExecutingActions">
+    </property>
+
+    <property name="Turret_Y">
+      <description></description>
+      <value>0</value>
+    </property>
+
+    <!-- -->
+    <!-- Methods-->
+    <method name="play">
+      <description></description>
+      <param name="actionName">
+         <description></description>
+      </param>
+      <param name="x">
+         <description></description>
+      </param>
+      <param name="y">
+         <description></description>
+      </param>
+      <param name="x2">
+         <description>一部命令形のみ</description>
+      </param>
+      <param name="y2">
+         <description>一部命令形のみ</description>
+      </param>
+    </method>
+    <method name="cancel">
+      <description></description>
+      <param name="actionName">
+         <description></description>
+      </param>
+    </method>
+    <method name="check">
+      <description>
+  指定されたアクション名のアクションを実行中かどうか.
+  check if give action is being executed or not.
+      </description>
+      <param name="actionName">
+      </param>
+      <param name="checkId">
+  <description>
+    指定されたアクションに関する情報が更新されていることを
+    保証する適当なID.
+    arbitrary id for the information identification.
+  </description>
+      </param>
+    </method>
+
+    <method name="openMouth">
+      <description>
+  execute mouth action
+      </description>
+      <param name="angle">
+      </param>
+    </method>
+
+    <!--    
+      <method name="shutdown">
+      </method>
+    -->
+  </local>
+
+  <disclosure>
+     <group>robot</group>
+     <role>actionPlayer</role>
+     <propertyRef name="Status"/>
+     <propertyRef name="Eye_R_P"/>
+     <propertyRef name="Eye_L_P"/>
+     <propertyRef name="Eye_R_Y"/>
+     <propertyRef name="Eye_L_Y"/>
+     <propertyRef name="Nec_P"/>
+     <propertyRef name="Nec_Y"/>
+     <propertyRef name="CheckTime"/>
+     <propertyRef name="CheckResponse"/>
+     <propertyRef name="CheckResponseId"/>
+     <propertyRef name="ExecutingActions"/>
+     <propertyRef name="Turret_Y"/>
+  </disclosure>
+
+  <disclosure>
+    <group>robot</group>
+    <role>eyeCheck</role>
+    <propertyRef name="EyeX"/>
+    <propertyRef name="EyeY"/>
+  </disclosure>
+
+<!--
+  <remote name="EnvManager">
+    <group>robot</group>
+    <role>envManager</role>
+  </remote> 
+
+  <remote name="speaker">
+    <group>Speak</group>
+    <role>speaker</role>
+  </remote> 
+
+  <remote name="recognizer">
+    <group>recognizer</group>
+    <role>face</role>
+  </remote> 
+
+   <remote name="Skood">
+     <group>speech</group>
+      <role>recognizer</role>
+  </remote>
+-->
+
+</moduleContext>

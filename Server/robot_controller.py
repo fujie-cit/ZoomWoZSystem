@@ -13,6 +13,11 @@ from DM import DM
 import configparser
 import threading
 
+current_dir = os.path.abspath(os.path.dirname(__file__))
+sys.path.append (os.path.abspath(os.path.join(current_dir, '../MMDAgentClient', 'run')))
+print(os.path.abspath(os.path.join(current_dir, '../MMDAgentClient', 'run')))
+import run_action_player
+
 os.environ["REGISTRY_SERVER_PORT"] = "25001"
 
 # sys config
@@ -53,7 +58,9 @@ class RobotController:
         raise NotImplementedError()
 
     def look(self, target):
-        # TODO: ロボット画像(アニメーション)の視線変更
+        # TODO: ロボット画像(アニメーション)の視線変更run_action_player.look(target)
+        run_action_player.look(target)
+
         # print('命令文: look, target: {}'.format(str(target)))
         # self.logger.stamp('look', 'NONE', target, 'NONE')
         topics = self.dialog_manager.logger.get_topic_history()

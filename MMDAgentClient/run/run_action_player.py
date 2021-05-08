@@ -5,6 +5,7 @@
 #####################################################
 import os
 import sys
+import time
 import traceback
 import readline
 
@@ -31,7 +32,7 @@ mmdagent_port = 7000
 
 # --- 実際の処理 ---
 import mmdagent_schema_client as msc
-# import sch_ss_speaker as ss
+import sch_ss_speaker as ss
 import sch_action as sa
 import sch_action_player as sap
 
@@ -41,12 +42,14 @@ action_dictionary = sa.ActionDictionary ()
 action_dictionary.read (action_dir)
 context = sa.ActionMasterContext (action_dictionary)
 
-# speaker = ss.SchemaSpeaker (client, speech_speaker_module_xml_path)
+lip_sync = ss.LipSync(client)
+sound_player = ss.SoundPlay(lip_sync)
+
 action_player = sap.ActionPlayer (client, context)
 # action_player_monea_thread = sap.ActionPlayerMoneaThread (
 #      action_player, action_player_module_xml_path)
 
-# speaker.start ()
+sound_player.start ()
 action_player.start ()
 # action_player_monea_thread.start ()
 
@@ -57,6 +60,15 @@ def look(usr):
         action_player.put_le(-20, 10)
     else:
         action_player.put_ln(0, 0)
+
+def nod():
+    client.send('NEC_X_P', -20)
+    time.sleep(0.3)
+    client.send('NEC_X_P', 0)
+    time.sleep(0.3)
+    client.send('NEC_X_P', -20)
+    time.sleep(0.3)
+    client.send('NEC_X_P', 0)
 
 # while True:
 #     try:

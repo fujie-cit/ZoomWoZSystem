@@ -40,15 +40,16 @@ class TTS():
             audio_config=audio_config
         )
 
-        p = pyaudio.PyAudio()
-        stream = p.open(format=p.get_format_from_width(WIDTH),
-                        channels=CHANNEL,
-                        rate=RATE,
-                        output=True)
-
-        if response.audio_content != '':
-            stream.write(response.audio_content)
-
-        stream.stop_stream()
-        stream.close()
-        p.terminate()
+        return response.audio_content
+        # p = pyaudio.PyAudio()
+        # stream = p.open(format=p.get_format_from_width(WIDTH),
+        #                 channels=CHANNEL,
+        #                 rate=RATE,
+        #                 output=True)
+        #
+        # if response.audio_content != '':
+        #     stream.write(response.audio_content)
+        #
+        # stream.stop_stream()
+        # stream.close()
+        # p.terminate()

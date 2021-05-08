@@ -42,6 +42,7 @@ class LogManager:
         self.topic_cash_list = {'title': [], 'mid': []}  # コントローラーに表示するために頻繁にアクセスするためキャッシュする
         self.person_cash_list = []  # コントローラーに表示するために頻繁にアクセスするためキャッシュする
         self.command_cash_list = []  # コントローラーに表示するために頻繁にアクセスするためキャッシュする
+        self.genre_cash_list = []
 
     def get_main_data_dict(self):
         data_dict = {'id': None, 'time': None, 'action': None,
@@ -138,6 +139,9 @@ class LogManager:
     def set_command(self, command):
         self.command_cash_list.append(command)
 
+    def set_genre(self, genre):
+        self.genre_cash_list.append(genre)
+
     def set_review(self, topic, review):
         self.topic_review_hitory_dict[topic].append(review)
 
@@ -164,6 +168,12 @@ class LogManager:
     def get_topic_person(self):
         if len(self.person_cash_list) > 0:
             return self.person_cash_list[-1]
+        else:
+            return None
+
+    def get_current_genre(self):
+        if len(self.person_cash_list) > 0:
+            return self.genre_cash_list[-1]
         else:
             return None
 

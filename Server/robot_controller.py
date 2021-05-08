@@ -2,10 +2,10 @@
 """
 Robot身体制御
 """
-__author__ = "Yuto Akagawa"
-__editor__ = "Hayato Katayama"
+__author__ = "Jin Sakuma"
 import os.path
 import sys
+import time
 from STT import STT
 from TTS import TTS
 from NLG import NLG
@@ -42,34 +42,27 @@ class RobotController:
         self.preorder = ""
         self.genre_flg = False  # ジャンル誤り訂正フラグ
 
+        self.curr_target = None
         # 音声認識を別スレッドで開始する
         self.stt.start()
 
-    def control_face(self):
-        # while 1:
-        #     key = getch.getch()
-        #     if key == "j":  # J: Look A
-        #         self.look("A")
-        #     elif key == "k":  # K: Nod
-        #         self.nod()
-        #     elif key == "l":  # L: Look B
-        #         self.look("B")
-        raise NotImplementedError()
-
     def look(self, target):
-        # TODO: ロボット画像(アニメーション)の視線変更run_action_player.look(target)
-        run_action_player.look(target)
+        if target != self.curr_target:
+            self.curr_target = target
+            run_action_player.look(target)
 
-        # print('命令文: look, target: {}'.format(str(target)))
-        # self.logger.stamp('look', 'NONE', target, 'NONE')
         topics = self.dialog_manager.logger.get_topic_history()
         persons = self.dialog_manager.logger.get_person_history()
         return topics, persons
 
     def nod(self, target):
-        # order = 'nod'
-        print('命令文: nod' + target)
-        # self.logger.stamp('nod', 'NONE', target, 'NONE')
+        if target != self.curr_target:
+            self.curr_target = target
+            run_action_player.look(target)
+            time.sleep(0.5)
+            
+        run_action_player.nod()
+
         topics = self.dialog_manager.logger.get_topic_history()
         persons = self.dialog_manager.logger.get_person_history()
         return topics, persons
@@ -104,9 +97,9 @@ class RobotController:
         genre_list = {"romance": "ロマンス", "SF": "SF", "action": "アクション", "horror": "ホラー", "human": "ヒューマンドラマ",
                       "anime": "アニメーション映画", "comedy": "コメディー", "advenchar": "アドベンチャー", "mistery": "ミステリー"}
         genre = genre_list[genre]
-        self.conv_manager.set_current_genre(genre)
-        self.genre_flg = True
-        # self.logger.stamp('change_genre', genre, target, 'NONE')
+        genre_id = self.dialog_manager.api.genre2id(genre)
+        self.dialog_manager.logger.set_genre(genre_id)
+
         topics = self.dialog_manager.logger.get_topic_history()
         persons = self.dialog_manager.logger.get_person_history()
         return topics, persons
@@ -119,15 +112,11 @@ class RobotController:
         """
         self.utterance_history.append(utterance)
 
-    def send_message(self, message):
-        # builder = self.remote_ad.newProcessingRequestBuilder('play')
-        # builder.characters('actionName', message.decode('utf-8').encode('euc_jp'))
-        # builder.sendMessage()
-        raise NotImplementedError()
-
     def main(self, target, text):
+        if target != self.curr_target:
+            self.curr_target = target
+            self.look(target)
 
-        self.look(target)
         sys.stdout.write(GREEN)
         sys.stdout.write("\033[K")
         sys.stdout.write("{}: ".format(target) + text + "\n")
@@ -266,22 +255,27 @@ class RobotController:
         else:
             # 推薦の訂正
             if "recommendation" in message:
-                # TODO: 実装
-                raise NotImplementedError()
-                # command = "recommendation"
-                # if self.genre_flg:  # すでに手動でジャンルを選んでいる場合
-                #     genre = self.conv_manager.get_current_genre()
-                #     self.genre_flg = False
-                # else:
-                #     # TODO: ジャンルの決定
-                #     text_list, target_list = self.nlu.get_text(N=2)
-                #     genre = self.nlu.check_genre(text_list)
-                #
-                # topic, genre = self.utterance_generator.topic_random_choice(genre, topic_memory)
-                # if topic is not None:
-                #     self.change_topic(topic, "R", genre)
-                # elif topic is None and genre is None:
-                #     order = "stock-empty"
+
+                command = "recommendation"
+                genre_id = self.dialog_manager.logger.get_current_genre()
+                if genre_id:
+                    slot = {"genre": genre_id, "person": None, "sort_by": None, "history": None}
+                else:
+                    slot = {"genre": None, "person": None, "sort_by": None, "history": None}
+
+                # DM
+                output, id = self.dialog_manager.main(command, slot, target)
+                self.dialog_manager.logger.exec_log(id)
+                if 'topic' in output.keys():
+                    if output['topic'] is not None:
+                        topic = output['topic']
+                        mid = output['mid']
+                        self.dialog_manager.logger.set_topic_cash(topic, mid)
+
+                # NLG
+                utterance = self.nlg.generate(command, slot, output)
+
+
 
             # yes, no, unknown, repeatの訂正
             elif message.replace("-correction", "", 1) in ["no", "yes", "unknown", "repeat"]:
@@ -339,16 +333,19 @@ class RobotController:
                 self.dialog_manager.logger.set_command(command)
                 slot = None
 
-        if utterance is not None:
+        if target != self.curr_target:
+            self.curr_target = target
             self.look(target)
+
+        if utterance is not None:
             sys.stdout.write(GREEN)
             sys.stdout.write("\033[K")
             sys.stdout.write("Robot: " + utterance + "\n")
             sys.stdout.write(END)
 
         # TODO: 音声合成
-        thread = threading.Thread(target=self.tts.generate, args=([utterance]))
-        thread.start()
+        sound_data = self.tts.generate(utterance)
+        run_action_player.sound_player.put(sound_data)
 
         # 発話ログ
         self.dialog_manager.logger.write_asr_log("U", utterance)

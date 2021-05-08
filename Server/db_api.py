@@ -117,3 +117,14 @@ class DB_API():
             genre = None
 
         return genre
+
+    def genre2id(self, genre):
+        sql_order = "SELECT genre_id FROM genre_ids WHERE genre = '{}'".format(genre)
+        columns = ["genre_id"]
+        df = self.sql_execute(sql_order, columns=columns)
+        if len(df) > 0:
+            genre_id = df['genre_id'].iloc[0]
+        else:
+            genre_id = None
+
+        return genre_id

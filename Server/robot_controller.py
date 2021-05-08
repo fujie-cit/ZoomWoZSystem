@@ -35,6 +35,7 @@ class RobotController:
         self.tts = TTS(self.config)
         self.nlg = NLG(self.config)
         self.dialog_manager = DM(self.config)
+        self.agent_player = run_action_player.AgentPlayer()
 
         self.utterance_candidate = {'id': None, 'command': None, 'utterance': None, 'topic': None, 'mid': None}
         self.active_command = None
@@ -42,14 +43,15 @@ class RobotController:
         self.preorder = ""
         self.genre_flg = False  # ジャンル誤り訂正フラグ
 
-        self.curr_target = None
+        self.curr_target = None # 現在システムが見ているtarget
+
         # 音声認識を別スレッドで開始する
         self.stt.start()
 
     def look(self, target):
         if target != self.curr_target:
             self.curr_target = target
-            run_action_player.look(target)
+            self.agent_player.look(target)
 
         topics = self.dialog_manager.logger.get_topic_history()
         persons = self.dialog_manager.logger.get_person_history()
@@ -58,10 +60,10 @@ class RobotController:
     def nod(self, target):
         if target != self.curr_target:
             self.curr_target = target
-            run_action_player.look(target)
+            self.agent_player.look(target)
             time.sleep(0.5)
-            
-        run_action_player.nod()
+
+        self.agent_player.nod()
 
         topics = self.dialog_manager.logger.get_topic_history()
         persons = self.dialog_manager.logger.get_person_history()
@@ -113,10 +115,18 @@ class RobotController:
         self.utterance_history.append(utterance)
 
     def main(self, target, text):
-        if target != self.curr_target:
-            self.curr_target = target
-            self.look(target)
+        """
+        音声認識されるたびに動く
 
+        input:
+            target: str  ... ユーザ(A or B)
+            text: str ... 音声認識結果
+        output:
+          topic_list: list(str) ... トピックの履歴の1次元リスト
+        """
+
+
+        self.look(target)
         sys.stdout.write(GREEN)
         sys.stdout.write("\033[K")
         sys.stdout.write("{}: ".format(target) + text + "\n")
@@ -168,19 +178,14 @@ class RobotController:
 
     def utter(self, message, target):
         """
+        Wizardがボタンを操作した際に動く
+
         input:
           message: str ... 行動タイプ
           target: str  ... ユーザ(A or B)
 
         output:
           topic_list: list(str) ... トピックの履歴の1次元リスト
-
-        処理内容
-          orderの決定
-          　topicの確認
-          　genreの確認・変更
-          発話生成
-          音声合成
         """
 
         utterance = None
@@ -333,17 +338,14 @@ class RobotController:
                 self.dialog_manager.logger.set_command(command)
                 slot = None
 
-        if target != self.curr_target:
-            self.curr_target = target
-            self.look(target)
-
         if utterance is not None:
+            self.look(target)
             sys.stdout.write(GREEN)
             sys.stdout.write("\033[K")
             sys.stdout.write("Robot: " + utterance + "\n")
             sys.stdout.write(END)
 
-        # TODO: 音声合成
+        # 音声合成
         sound_data = self.tts.generate(utterance)
         run_action_player.sound_player.put(sound_data)
 
@@ -359,16 +361,3 @@ class RobotController:
         topics = self.dialog_manager.logger.get_topic_history()
         persons = self.dialog_manager.logger.get_person_history()
         return topics, persons
-
-    def terminate(self, detail):
-        # self.logger.write(detail)
-        # self.conv_manager.flash_topic_memory_list()
-        # self.csv.write(self.topic_file_path, self.conv_manager.get_topic_history())
-        raise NotImplementedError()
-
-"""
-if __name__ == '__main__':
-    bc = RobotController()
-    bc.look('A')
-    bc.utter('actor', 'none')
-"""

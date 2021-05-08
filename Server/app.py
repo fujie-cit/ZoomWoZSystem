@@ -2,6 +2,7 @@
 __editor__ = "Jin Sakuma"
 from flask import Flask, render_template, request
 from robot_controller import RobotController
+import sys
 import logging
 import logging.handlers
 
@@ -27,15 +28,6 @@ topic_history_length = 6
 @app.route('/')
 def index():
     return render_template('index.html')
-
-
-@app.route('/terminate', methods=['POST'])
-def terminate():
-    fname = request.form['message']
-    print(fname)
-    # rc.terminate(request.form['message'])
-    return render_template('index.html', name='change')
-
 
 @app.route('/stt', methods=['POST'])
 def stt():

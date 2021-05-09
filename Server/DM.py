@@ -489,6 +489,32 @@ class DM:
         output = {'genres': genres, 'topic': title, 'mid': mid}
         return output, id
 
+    def get_question(self, slot, target, type='active'):
+        '''
+        slot: dict
+            key: title 映画タイトル
+        '''
+
+        title = slot['title']
+        title_list = self.logger.get_topic_history()
+        mid_list = self.logger.get_mid_history()
+        # すでに話題に上がっている場合
+        if title in title_list:
+            mid = mid_list[title_list.index(title)]
+        # 話題に上がっていない場合
+        else:
+            mid = None
+
+        # 対話履歴をセット
+        data_dict = self.logger.get_main_data_dict()
+        data_dict.update(action='utter', target=target, topic=mid,
+                         command='genre', type=type)
+
+        id = self.logger.write(data_dict, slot, [])
+        output = {'topic': title, 'mid': mid}
+        return output, id
+
+
     def main(self, command, slot, target, type='passive'):
         '''
         DB, 対話履歴を参照してNLGに渡す情報を決定
@@ -519,7 +545,7 @@ class DM:
         15.yes              slot: None, "はい、そうです"
         16.no               slot: None, "違います"
         17.question         slot: None, "XXは興味ありますか？"
-        18.check            slot: NONE, "観に行く映画は決まりましたか？"
+        18.sumarize         slot: NONE, "観に行く映画は決まりましたか？"
         '''
 
         # commandを履歴に保存
@@ -550,11 +576,18 @@ class DM:
         elif command == 'genre':
             output, id = self.get_genres(slot, target, type)
 
-        # TODO ログとる
         elif command == 'question':
-            topic = self.logger.get_topic()
-            output = {'topic': topic}
+            output, id = self.get_question(slot, target, type)
+
+        elif command in ["start", "end", "sumarize"]:
+            # 対話履歴をセット
+            data_dict = self.logger.get_main_data_dict()
+            data_dict.update(action='utter', target=target, command=command, type=type)
+            id = self.logger.write(data_dict, slot, [])
+            output = {}
+
         else:
-            output = None
+            id = None
+            output = {}
 
         return output, id

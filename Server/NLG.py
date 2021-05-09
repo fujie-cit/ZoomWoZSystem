@@ -52,8 +52,8 @@ class NLG:
         13.end              slot: None, "行ってらっしゃい"
         14.yes              slot: None, "はい、そうです"
         15.no               slot: None, "違います"
-        16.question         slot: None, "XXは興味ありますか？"
-        17.check            slot: NONE  "観に行く映画は決まりましたか？"
+        16.question         slot: {"title": _}, "XXは興味ありますか？"
+        17.sumarize         slot: NONE  "観に行く映画は決まりましたか？"
         '''
 
         if 'recommendation' in command:
@@ -146,9 +146,12 @@ class NLG:
             utterance = "いいえ、違います"
 
         elif command == 'question':
-            utterance = "{}は興味ありますか".format(input['topic'])
+            if random.randint(0, 10) % 2 == 0:
+                 utterance = "{}は興味ありますか".format(slot['title'])
+            else:
+                utterance = "{}は見たいと思いますか".format(slot['title'])
 
-        elif command == 'check':
+        elif command == 'sumarize':
             utterance = "見に行く映画は決まりましたか"
 
         else:

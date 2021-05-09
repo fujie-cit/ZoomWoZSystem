@@ -106,13 +106,27 @@ class RobotController:
         persons = self.dialog_manager.logger.get_person_history()
         return topics, persons
 
-    def set_utterance(self, utterance):
+    def set_cash(self, output_dict):
         """
-        systemの発話履歴の記録
+        操作画面に表示するキャッシュをセット
         input:
-            utterance: str systemの発話文
+            output: dict DMの結果
         """
-        self.utterance_history.append(utterance)
+
+        # 映画タイトルのキャッシュ
+        if 'topic' in output_dict.keys():
+            if output_dict['topic'] is not None:
+                topic = output_dict['topic']
+                mid = output_dict['mid']
+                self.dialog_manager.logger.set_topic_cash(topic, mid)
+
+        # 人名のキャッシュ
+        if 'person_list' in output_dict.keys():
+            if output_dict['person_list'] is not None:
+                person_name_list = output_dict['person_list']
+                for person_name in person_name_list:
+                    self.dialog_manager.logger.set_person_cash(person_name)
+
 
     def main(self, target, text):
         """
@@ -189,77 +203,23 @@ class RobotController:
         """
 
         utterance = None
-
-        # orderの決定
         # 応答
         if "response-passive" in message:
             if self.utterance_candidate['command'] is not None:
                 self.dialog_manager.logger.set_command(self.utterance_candidate['command'])
-                utterance = self.utterance_candidate['utterance']
                 self.dialog_manager.logger.exec_log(self.utterance_candidate['id'])
-
-                if self.utterance_candidate['topic'] is not None:
-                    topic = self.utterance_candidate['topic']
-                    mid = self.utterance_candidate['mid']
-                    self.dialog_manager.logger.set_topic_cash(topic, mid)
-
-                if self.utterance_candidate['person_list'] is not None:
-                    person_name_list = self.utterance_candidate['person_list']
-                    for person_name in person_name_list:
-                        self.dialog_manager.logger.set_person_cash(person_name)
+                self.set_cash(self.utterance_candidate)
+                utterance = self.utterance_candidate['utterance']
             else:
                 pass
 
-        # 能動発話　詳細("abstract", "review", "evaluation", "actor", "director")
-        elif "detail-active" in message:
-            command = self.active_command
-            self.dialog_manager.logger.set_command(command)
-            slot = None
-            output, id = self.dialog_manager.main(command, slot, target, type='active')
-            self.dialog_manager.logger.exec_log(id)
-            if 'topic' in output.keys():
-                if output['topic'] is not None:
-                    topic = output['topic']
-                    mid = output['mid']
-                    self.dialog_manager.logger.set_topic_cash(topic, mid)
-
-            if 'person_list' in output.keys():
-                if output['person_list'] is not None:
-                    person_name_list = output['person_list']
-                    for person_name in person_name_list:
-                        self.dialog_manager.logger.set_person_cash(person_name)
-
-            utterance = self.nlg.generate(command, slot, output)
-
-        # yes, no, unknown
-        elif "yes-passive" in message or "no-passive" in message or "unknown-passive" in message:
-            # self.logger.stamp(message, topic, target, "Recognizing")
-            command = message.replace("-passive", "", 1)
-            self.dialog_manager.logger.set_command(command)
-            slot = None
-            output, id = self.dialog_manager.main(command, slot, target, type='correction')
-            self.dialog_manager.logger.exec_log(id)
-            utterance = self.nlg.generate(command, slot, output)
-
-        # 前の発話の繰り返し
-        elif "repeat" in message:
-            command = "repeat"
-            self.dialog_manager.logger.set_command(command)
-            slot = None
-            output, id = self.dialog_manager.main(command, slot, target, type='correction')
-            self.dialog_manager.logger.exec_log(id)
-            if 'topic' in output.keys():
-                if output['topic'] is not None:
-                    topic = output['topic']
-                    mid = output['mid']
-                    self.dialog_manager.logger.set_topic_cash(topic, mid)
-
-            utterance = self.nlg.generate(command, slot, output)
-
-        # 誤り訂正発話
         else:
-            # 推薦の訂正
+            # "recommendation"は能動と訂正両方ある
             if "recommendation" in message:
+                if "correction" in message:
+                    type = "correction"
+                else:
+                    type = "active"
 
                 command = "recommendation"
                 genre_id = self.dialog_manager.logger.get_current_genre()
@@ -268,46 +228,50 @@ class RobotController:
                 else:
                     slot = {"genre": None, "person": None, "sort_by": None, "history": None}
 
-                # DM
-                output, id = self.dialog_manager.main(command, slot, target)
-                self.dialog_manager.logger.exec_log(id)
-                if 'topic' in output.keys():
-                    if output['topic'] is not None:
-                        topic = output['topic']
-                        mid = output['mid']
-                        self.dialog_manager.logger.set_topic_cash(topic, mid)
+            # 能動発話 ("tips", "review", "evaluation", "cast", "director")
+            elif "detail-active" in message:
+                type = "active"
+                command = self.active_command
 
-                # NLG
-                utterance = self.nlg.generate(command, slot, output)
+                title = self.dialog_manager.logger.get_topic_title()
+                if command == "tips":
+                    slot = {"title": title, "tag": None, "history": True}
+                elif command == "review" or command == "cast":
+                    slot = {"title": title, "history": True}
+                elif command == "evaluation" or command == "director":
+                    slot = {"title": title}
 
+            # 能動発話 ("question")
+            elif "question" in message:
+                type = "active"
+                command = "question"
 
+                title = self.dialog_manager.logger.get_topic_title()
+                slot = {"title": title}
 
-            # yes, no, unknown, repeatの訂正
+            # 特殊コマンド
+            elif message in ["start", "summarize", "end"]:
+                type = "active"
+                command = message
+                slot = {}
+
+            # 特殊応答系の訂正 ("tips", "review")
             elif message.replace("-correction", "", 1) in ["no", "yes", "unknown", "repeat"]:
+                type = "correction"
                 command = message.replace("-correction", "", 1)
-                self.dialog_manager.logger.set_command(command)
-                slot = None
-                output, id = self.dialog_manager.main(command, slot, target, type='correction')
-                self.dialog_manager.logger.exec_log(id)
-                if 'topic' in output.keys():
-                    if output['topic'] is not None:
-                        topic = output['topic']
-                        mid = output['mid']
-                        self.dialog_manager.logger.set_topic_cash(topic, mid)
+                slot = {}
 
-                utterance = self.nlg.generate(command, slot, output)
-
+            # 人物詳細系の訂正 ("cast_detail", "directpr_detail")
             elif message.replace("-correction", "", 1) in ["cast_detail", "director_detail"]:
+                type = "correction"
                 command = message.replace("-correction", "", 1)
                 self.dialog_manager.logger.set_command(command)
                 person_name = self.dialog_manager.logger.get_topic_person()
                 slot = {"person": person_name, "history": True}
-                output, id = self.dialog_manager.main(command, slot, target, type='correction')
-                self.dialog_manager.logger.exec_log(id)
-                utterance = self.nlg.generate(command, slot, output)
 
-            # 内容詳細系の訂正
+            # 内容詳細系の訂正 ("tips", "review")
             elif "-correction" in message:
+                type = "correction"
                 command = message.split('-')[0]
                 topic = self.dialog_manager.logger.get_topic_title()
                 if command == 'tips':
@@ -316,27 +280,13 @@ class RobotController:
                 else:
                     slot = {"title": topic, "history": True}
 
-                self.dialog_manager.logger.set_command(command)
+            self.dialog_manager.logger.set_command(command)
+            output, id = self.dialog_manager.main(command, slot, target, type=type)
+            self.dialog_manager.logger.exec_log(id)
+            self.set_cash(output)
 
-                output, id = self.dialog_manager.main(command, slot, target, type='correction')
-                self.dialog_manager.logger.exec_log(id)
-                if 'topic' in output.keys():
-                    if output['topic'] is not None:
-                        topic = output['topic']
-                        mid = output['mid']
-                        self.dialog_manager.logger.set_topic_cash(topic, mid)
+            utterance = self.nlg.generate(command, slot, output)
 
-                if 'person_list' in output.keys():
-                    if output['person_list'] is not None:
-                        person_name_list = output['person_list']
-                        for person_name in person_name_list:
-                            self.dialog_manager.logger.set_person_cash(person_name)
-
-                utterance = self.nlg.generate(command, slot, output)
-            else:
-                command = message
-                self.dialog_manager.logger.set_command(command)
-                slot = None
 
         if utterance is not None:
             self.look(target)

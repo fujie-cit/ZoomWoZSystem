@@ -53,22 +53,35 @@ sound_player.start ()
 action_player.start ()
 # action_player_monea_thread.start ()
 
-def look(usr):
-    if usr == 'A':
-        action_player.put_le(20, 10)
-    elif usr == 'B':
-        action_player.put_le(-20, 10)
-    else:
-        action_player.put_ln(0, 0)
+class AgentPlayer():
+    def __init__(self):
+        self.client = client
 
-def nod():
-    client.send('NEC_X_P', -20)
-    time.sleep(0.3)
-    client.send('NEC_X_P', 0)
-    time.sleep(0.3)
-    client.send('NEC_X_P', -20)
-    time.sleep(0.3)
-    client.send('NEC_X_P', 0)
+        self.look_angle_y = 20
+        self.look_angle_p = 10
+
+        self.nod_interval = 0.3  # second
+        self.nod_angle = -20
+        self.nod_cnt = 2
+
+    def look(self, usr):
+        if usr == 'A':
+            action_player.put_le(self.look_angle_y, self.look_angle_p)
+        elif usr == 'B':
+            action_player.put_le(-self.look_angle_y, 10)
+        else:
+            action_player.put_ln(0, 0)
+
+    def nod(self):
+        for i in range(self.nod_cnt-1):
+            self.client.send('NEC_X_P', self.nod_angle)
+            time.sleep(self.nod_interval)
+            self.client.send('NEC_X_P', 0)
+            time.sleep(self.nod_interval)
+
+        self.client.send('NEC_X_P', -20)
+        time.sleep(self.nod_interval)
+        self.client.send('NEC_X_P', 0)
 
 # while True:
 #     try:

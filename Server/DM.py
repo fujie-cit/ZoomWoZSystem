@@ -59,16 +59,20 @@ class DM:
                 df = df[(df['evaluation'] < prev_score+1)]
 
         else:
+            print("#############")
             df = df.sort_values('popularity', ascending=False)
 
         if len(df) > 0:
             # ランダムに選ぶ
-            info = df.sample()
+            N = int(self.config['DM']['N'])
+            info = df[:N].sample()
             topic = info['title'].iloc[0]
             mid = info['movie_id'].iloc[0]
+            pron = info['pronunciation'].iloc[0]
         else:
             topic = ''
             mid = None
+            pron = None
 
         # 対話履歴をセット
         data_dict = self.logger.get_main_data_dict()
@@ -77,7 +81,7 @@ class DM:
 
         id = self.logger.write(data_dict, slot, [topic])
 
-        output = {'topic': topic, 'mid': mid}
+        output = {'topic': topic, 'mid': mid, 'pron': pron}
         return output, id
 
     def get_cast(self, slot, target, type='passive'):
@@ -93,7 +97,9 @@ class DM:
         # すでに話題に上がっている場合
         if title in title_list:
             mid = mid_list[title_list.index(title)]
-            cast_list = self.api.get_crew(mid, job_id)['name_en'].tolist()
+            cast_list = self.api.get_crew(mid, job_id)['name_ja'].tolist()
+            if cast_list[0] is None:
+                cast_list = self.api.get_crew(mid, job_id)['name_en'].tolist()
 
         # 話題に上がっていない場合
         else:
@@ -101,7 +107,9 @@ class DM:
             if len(df) > 0:
                 movie_info = df.iloc[0]
                 mid = movie_info['movie_id']
-                cast_list = self.api.get_crew(mid, job_id)['name_en'].tolist()
+                cast_list = self.api.get_crew(mid, job_id)['name_ja'].tolist()
+                if cast_list[0] is None:
+                    cast_list = self.api.get_crew(mid, job_id)['name_en'].tolist()
             else:
                 cast_list = []
                 mid = -1
@@ -152,14 +160,18 @@ class DM:
         # すでに話題に上がっている場合
         if title in title_list:
             mid = mid_list[title_list.index(title)]
-            director_list = self.api.get_crew(mid, job_id)['name_en'].tolist()
+            director_list = self.api.get_crew(mid, job_id)['name_ja'].tolist()
+            if director_list[0] is None:
+                director_list = self.api.get_crew(mid, job_id)['name_en'].tolist()
         # 話題に上がっていない場合
         else:
             df = self.api.search_movie_by_title('title')
             if len(df) > 0:
                 movie_info = df.iloc[0]
                 mid = movie_info['movie_id']
-                director_list = self.api.get_crew(mid, job_id)['name_en'].tolist()
+                director_list = self.api.get_crew(mid, job_id)['name_ja'].tolist()
+                if director_list[0] is None:
+                    director_list = self.api.get_crew(mid, job_id)['name_en'].tolist()
             else:
                 director_list = []
                 mid = -1
@@ -579,7 +591,7 @@ class DM:
         elif command == 'question':
             output, id = self.get_question(slot, target, type)
 
-        elif command in ["start", "end", "sumarize"]:
+        elif command in ["yes", "no", "start", "end", "sumarize"]:
             # 対話履歴をセット
             data_dict = self.logger.get_main_data_dict()
             data_dict.update(action='utter', target=target, command=command, type=type)

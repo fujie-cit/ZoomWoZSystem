@@ -90,17 +90,14 @@ class RobotController:
         persons = self.dialog_manager.logger.get_person_history()
         return topics, persons
 
-    def change_genre(self, genre, target):
+    def change_genre(self, genre_id, target):
         '''
         推薦ジャンルを変更する
         target: topicを変えた人(R:robot, U:user)
         '''
         # genre = genre.decode("utf-8")
-        genre_list = {"romance": "ロマンス", "SF": "SF", "action": "アクション", "horror": "ホラー", "human": "ヒューマンドラマ",
-                      "anime": "アニメーション映画", "comedy": "コメディー", "advenchar": "アドベンチャー", "mistery": "ミステリー"}
-        genre = genre_list[genre]
-        genre_id = self.dialog_manager.api.genre2id(genre)
-        self.dialog_manager.logger.set_genre(genre_id)
+        # genre_id = self.dialog_manager.api.genre2id(genre)
+        self.dialog_manager.logger.set_genre(int(genre_id))
 
         topics = self.dialog_manager.logger.get_topic_history()
         persons = self.dialog_manager.logger.get_person_history()
@@ -224,9 +221,10 @@ class RobotController:
                 command = "recommendation"
                 genre_id = self.dialog_manager.logger.get_current_genre()
                 if genre_id:
-                    slot = {"genre": genre_id, "person": None, "sort_by": None, "history": None}
+                    print(genre_id)
+                    slot = {"genre": genre_id, "person": None, "sort_by": None, "history": True}
                 else:
-                    slot = {"genre": None, "person": None, "sort_by": None, "history": None}
+                    slot = {"genre": None, "person": None, "sort_by": None, "history": True}
 
             # 能動発話 ("tips", "review", "evaluation", "cast", "director")
             elif "detail-active" in message:

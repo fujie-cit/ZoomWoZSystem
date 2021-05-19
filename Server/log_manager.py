@@ -172,7 +172,7 @@ class LogManager:
             return None
 
     def get_current_genre(self):
-        if len(self.person_cash_list) > 0:
+        if len(self.genre_cash_list) > 0:
             return self.genre_cash_list[-1]
         else:
             return None

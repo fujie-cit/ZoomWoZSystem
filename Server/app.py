@@ -56,6 +56,8 @@ def push_button(command, detail):
         topics, persons = rc.look(detail)
     elif command == 'nod':
         topics, persons = rc.nod(detail)
+    elif command == 'cancel':
+        topics, persons = rc.look(target='U')
     elif command == 'change-topic':
         topics, persons = rc.change_topic_title(detail)
     elif command == 'change-person':

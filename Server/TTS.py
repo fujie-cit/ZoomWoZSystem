@@ -2,7 +2,7 @@ from google.cloud import texttospeech
 import os
 import pyaudio
 
-os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'config/sincere-stack-307000-836c8778a98c.json'
+
 CHUNK = 1024
 WIDTH = 2
 CHANNEL = 1
@@ -12,7 +12,8 @@ RATE = 24000
 class TTS():
     def __init__(self, config):
         self.config = config
-        self.path = self.config["TTS"]["path"]
+        os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = config['TTS']['key_path']
+
         # クライアントの生成
         self.client = texttospeech.TextToSpeechClient()
 
@@ -41,15 +42,3 @@ class TTS():
         )
 
         return response.audio_content
-        # p = pyaudio.PyAudio()
-        # stream = p.open(format=p.get_format_from_width(WIDTH),
-        #                 channels=CHANNEL,
-        #                 rate=RATE,
-        #                 output=True)
-        #
-        # if response.audio_content != '':
-        #     stream.write(response.audio_content)
-        #
-        # stream.stop_stream()
-        # stream.close()
-        # p.terminate()

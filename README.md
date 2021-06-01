@@ -6,6 +6,7 @@
 ## 動作環境
 * windows10
 * python3
+* google test to speech api  (https://cloud.google.com/text-to-speech)
 
 ## Agentの設定
 mmdagent-fujielabを使用. 設定は以下のノートを参照  

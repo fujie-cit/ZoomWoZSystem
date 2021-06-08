@@ -5,25 +5,11 @@ MySQLデータベースを用いた発話生成
 """
 __editor__ = "Hayato Katayama"
 import random
-import pandas as pd
-import MySQLdb
-from tmdb_api import TMDB
-from datetime import datetime
-
-
-#  MySQL Config
-HOST = "localhost"
-DB_NAME = "movie"
-USER = "root"
-PASSWORD = ""
-COLUMNS = ["movie_id", "title", "overview", "review", "evaluation", "popularity", "runtime", "date", "genres", "cast", "director"]
 
 
 class NLG:
     def __init__(self, config):
         self.config = config
-        self.api_token = self.config["TMDB"]["api_token"]
-        self.api = TMDB(self.api_token)
 
     def generate(self, command, slot, input):
         '''

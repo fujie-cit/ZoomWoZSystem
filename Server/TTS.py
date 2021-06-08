@@ -2,7 +2,7 @@ from google.cloud import texttospeech
 import os
 import pyaudio
 
-os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'config/sincere-stack-307000-836c8778a98c.json'
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'config/dialogsys-8962938dd5f3.json'
 CHUNK = 1024
 WIDTH = 2
 CHANNEL = 1

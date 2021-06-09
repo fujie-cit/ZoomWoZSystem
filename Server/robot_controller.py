@@ -31,7 +31,7 @@ class RobotController:
     def __init__(self):
         self.config = configparser.ConfigParser()
         self.config.read('config/config.ini', encoding='utf-8')
-        self.stt = STT()
+        # self.stt = STT(self.config)
         self.tts = TTS(self.config)
         self.nlg = NLG(self.config)
         self.dialog_manager = DM(self.config)
@@ -46,7 +46,7 @@ class RobotController:
         self.curr_target = None # 現在システムが見ているtarget
 
         # 音声認識を別スレッドで開始する
-        self.stt.start()
+        # self.stt.start()
 
     def look(self, target):
         if target != self.curr_target:
@@ -200,6 +200,10 @@ class RobotController:
         """
 
         utterance = None
+        # 現状のHTMLの引数を取得しておく(誤操作などで更新がない場合はこれを返す)
+        topics = self.dialog_manager.logger.get_topic_history()
+        persons = self.dialog_manager.logger.get_person_history()
+
         # 応答
         if "response-passive" in message:
             if self.utterance_candidate['command'] is not None:
@@ -220,6 +224,9 @@ class RobotController:
 
                 command = "recommendation"
                 genre_id = self.dialog_manager.logger.get_current_genre()
+                if genre_id is None:
+                    return topics, persons
+
                 if genre_id:
                     print(genre_id)
                     slot = {"genre": genre_id, "person": None, "sort_by": None, "history": True}
@@ -232,6 +239,9 @@ class RobotController:
                 command = self.active_command
 
                 title = self.dialog_manager.logger.get_topic_title()
+                if title is None:
+                    return topics, persons
+
                 if command == "tips":
                     slot = {"title": title, "tag": None, "history": True}
                 elif command == "review" or command == "cast":
@@ -245,7 +255,10 @@ class RobotController:
                 command = "question"
 
                 title = self.dialog_manager.logger.get_topic_title()
-                slot = {"title": title}
+                if title is not None:
+                    slot = {"title": title}
+                else:
+                    return topics, persons
 
             # 特殊コマンド
             elif message in ["start", "summarize", "end"]:
@@ -265,18 +278,24 @@ class RobotController:
                 command = message.replace("-correction", "", 1)
                 self.dialog_manager.logger.set_command(command)
                 person_name = self.dialog_manager.logger.get_topic_person()
-                slot = {"person": person_name, "history": True}
+                if person_name is not None:
+                    slot = {"person": person_name, "history": True}
+                else:
+                    return topics, persons
 
             # 内容詳細系の訂正 ("tips", "review")
             elif "-correction" in message:
                 type = "correction"
                 command = message.split('-')[0]
-                topic = self.dialog_manager.logger.get_topic_title()
-                if command == 'tips':
-                    tag = message.split('-')[1]
-                    slot = {"title": topic, "tag": tag, "history": True}
+                title = self.dialog_manager.logger.get_topic_title()
+                if title is not None:
+                    if command == 'tips':
+                        tag = message.split('-')[1]
+                        slot = {"title": title, "tag": tag, "history": True}
+                    else:
+                        slot = {"title": title, "history": True}
                 else:
-                    slot = {"title": topic, "history": True}
+                    return topics, persons
 
             self.dialog_manager.logger.set_command(command)
             output, id = self.dialog_manager.main(command, slot, target, type=type)
@@ -284,7 +303,6 @@ class RobotController:
             self.set_cash(output)
 
             utterance = self.nlg.generate(command, slot, output)
-
 
         if utterance is not None:
             self.look(target)
@@ -306,6 +324,7 @@ class RobotController:
         slot = {'title': title, 'history': None}
         self.active_command = self.dialog_manager.logger.get_not_used_active_command(mid)
 
+        # HTMLへ渡す引数の更新
         topics = self.dialog_manager.logger.get_topic_history()
         persons = self.dialog_manager.logger.get_person_history()
         return topics, persons

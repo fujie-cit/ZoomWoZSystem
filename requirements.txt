@@ -1,3 +1,4 @@
 python-socketio
 mysqlclient
 websocket-client
+google-cloud-texttospeech

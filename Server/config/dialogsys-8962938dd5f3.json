@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "dialogsys",
+  "private_key_id": "8962938dd5f301d06cf9963e4e55d38e13c76bed",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCv1u9zFUKqVHXM\n9eoilKbDzf27UBtEeIMWRmSineAnYZBMy7ibR+6URNYxGvJLjRrlVfbw5IJ1jiCm\nk+YECOfAQ16+6160v62gDRmQKC3VXeWMfy/MeEXJeYtny44RbMuj2KIovo2KKPu+\nh6ZgystLfsB12ob7cANUViZBYGTm4c1NvLQ+DDLMW7S6i5//srgMtGSddy5G05nB\nA+eBZD5/FaD//wWoglBAMpncBhN6le+VyPCXv/KAW1CeSgnSFryQNCgczH+l8paS\n7GIAoJrPwnTYWOuyxppCrxfyPabyySFf7WP0rRwSmAmuwuQ/Oi3tMl+Np8C/7HK5\niQ49t/JDAgMBAAECggEABghHeSLuMo4GShedBoNLAtmOkKz2jFu3Q4ysNokw7Atm\n9SLh4X4stSKwCOc61GhjJfpd7NeMfoKypA4qjGXPWdcJhujAhhOCQGxQKgox6FXS\ndi3oEAmHosF/x77fWcGu9xU8uHTOmpDvNuukud8xT8YHQ6FRa9lHSOKgpB4j/2ji\n6P9eBoLD6C0L9yK72pS+rEyZkLA5+VDVtMC8r4GSkL2oDgXy1Cg/myG4HWHa7ILT\nplSd3M4QEhQS5uT828P2FWeUOVk+rn+JKtYmrJ90aryuoB/v8dpnQdLfMa/vlt0H\nDzObeFAcSkLChQ1RdO9EV+QTZd1AHTBiUYB26TGnQQKBgQDo+9/WbxeAjs4sfhUv\nEVuSuI3OYkbiLfMaIDExYv8aWT0XY46X5FhBQYjtEzsBLMwfrVk8bUqSmVvwxReW\nD+MWQyXV5egrnkCUJveGpNIPA9mVIC7McHjXwbQRtmTGDxi5bBodSw67He0LvIQ2\n7OfN2+bMOAmokxb054uTik/SuQKBgQDBNeQOA0csYzY+gIInGlidWDFFOVaIUl1e\ng78Ifj0bDj36Y84M1IaK6elQZP/weJOqOAFbXZ4yGHxEbbACpndEQgp1AOk6zJWQ\nbaVLtwpfVTn29fRe44Mhs+yURYu59lPVy7jV9uIjPAl/UQheGK1SC1yUDzqLlSVt\nWW76/CUe2wKBgQDoe42ceDZHfjiVhSq2UOfDvI0kSETbJWbTxxPPaC2OqUWgtSNw\nxdabJz3u86WJQp5dbakB9zzWlFl+I+2pPCkp6c8zZbsK61sdetS8cnN5sCnJ+Nc6\nAXFUOmHo2swsJpxRSmG0oVUNuorzjyWPeU7FyIzBc5mPsVbTAsnwa6/DYQKBgAgp\nz73r04kDlBol8dnXGiFjxYkoOAjAeiNxK5QfSVOoUWQP7XfLTvf1lB8KdWninlKV\n1TDYDsQNFssJW2NxRx7CL5Dr/e63ECavC0ncrPqELlPJ5o5PzI2S/Y7yNUohJz+k\nQOYBbWKRudEASns3TbNmuX2j+xREs/UfzzmZh7P7AoGAL9uRwz8NIG+S9XNT9zBu\nQax1uN4Eut1bcdxJ/6cLaWBZcw6cLaAvOo93tB8aeLeeRDrKGfttYW4lHsor2rna\nfkKFNpioWQL+WF2zQmEbVIvq2lWuoNKwmXxPj0iDvmDM7dN7gy3VvudVJhUuD8Ba\nmPAgmE8WiFrDrAdRIYFDjbU=\n-----END PRIVATE KEY-----\n",
+  "client_email": "dialogsys@dialogsys.iam.gserviceaccount.com",
+  "client_id": "114519896910147257863",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/dialogsys%40dialogsys.iam.gserviceaccount.com"
+}

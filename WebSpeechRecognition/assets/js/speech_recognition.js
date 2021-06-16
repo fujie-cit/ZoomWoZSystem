@@ -1,9 +1,9 @@
 const socket = io.connect();                  // ソケットio
 const speech = new webkitSpeechRecognition(); // 音声認識APIの使用
 speech.lang = "ja";
-speech.interimResults = true                      // 言語を日本語に設定
+// speech.interimResults = true                      // 言語を日本語に設定
 let keep_standby = false;
-let usr = None;
+let usr = "";
 
 function update_prosess(text) { $("#prosess").text(text); } // 音声認識 スタンバイ/停止 表示
 function update_status(text)  { $("#status").html(text); }  // 音声認識 イベント 表示
@@ -46,12 +46,12 @@ $(function () {
     });
     $("#usr_A_btn").on('click', () => {
         update_usr('<span class="text-success">ユーザAを選択しています</span>');
-        usr = A;
+        usr = "A";
 
     });
     $("#usr_B_btn").on('click', () => {
         update_usr('<span class="text-success">ユーザBを選択しています</span>');
-        usr = B;
+        usr = "B";
 
     });
 

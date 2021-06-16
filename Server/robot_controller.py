@@ -6,6 +6,7 @@ __author__ = "Jin Sakuma"
 import os.path
 import sys
 import time
+import datetime
 from STT import STT
 from TTS import TTS
 from NLG import NLG
@@ -31,7 +32,7 @@ class RobotController:
     def __init__(self):
         self.config = configparser.ConfigParser()
         self.config.read('config/config.ini', encoding='utf-8')
-        # self.stt = STT(self.config)
+        self.stt = STT(self.config)
         self.tts = TTS(self.config)
         self.nlg = NLG(self.config)
         self.dialog_manager = DM(self.config)
@@ -46,7 +47,7 @@ class RobotController:
         self.curr_target = None # 現在システムが見ているtarget
 
         # 音声認識を別スレッドで開始する
-        # self.stt.start()
+        self.stt.start()
 
     def look(self, target):
         if target != self.curr_target:
@@ -125,7 +126,7 @@ class RobotController:
                     self.dialog_manager.logger.set_person_cash(person_name)
 
 
-    def main(self, target, text):
+    def main(self, date, time, target, text):
         """
         音声認識されるたびに動く
 
@@ -144,7 +145,7 @@ class RobotController:
         sys.stdout.write(END)
 
         # 音声認識のログを取る
-        self.dialog_manager.logger.write_asr_log(target, text)
+        self.dialog_manager.logger.write_asr_log(date, time, target, text)
 
         # 能動発話候補をあらかじめ算出しておく
         title = self.dialog_manager.logger.get_topic_title()
@@ -224,8 +225,8 @@ class RobotController:
 
                 command = "recommendation"
                 genre_id = self.dialog_manager.logger.get_current_genre()
-                if genre_id is None:
-                    return topics, persons
+                # if genre_id is None:
+                #     return topics, persons
 
                 if genre_id:
                     print(genre_id)
@@ -316,7 +317,10 @@ class RobotController:
         run_action_player.sound_player.put(sound_data)
 
         # 発話ログ
-        self.dialog_manager.logger.write_asr_log("U", utterance)
+        now = datetime.datetime.now()
+        now_str = now.strftime("%Y%m%d %H%M%S.") + "%d" % (now.microsecond / 10000)
+        date, time = now_str.split(" ")
+        self.dialog_manager.logger.write_asr_log(date, time, "U", utterance)
 
         # 能動発話候補をあらかじめ算出しておく
         title = self.dialog_manager.logger.get_topic_title()

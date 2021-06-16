@@ -31,9 +31,11 @@ def index():
 
 @app.route('/stt', methods=['POST'])
 def stt():
+    date = request.form['date']
+    time = request.form['time']
     text = request.form['text']
     user = request.form['user']
-    topics, persons = rc.main(user, text)
+    topics, persons = rc.main(date, time, user, text)
 
     while len(topics) < topic_history_length:
         topics.append('NONE')
@@ -41,6 +43,7 @@ def stt():
     while len(topics) > topic_history_length:
         topics.pop(0)
         persons.pop(0)
+
     message_dic = {}
     message_dic['topics'] = topics
     message_dic['person'] = persons

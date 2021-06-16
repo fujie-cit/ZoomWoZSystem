@@ -26,13 +26,13 @@ class LogManager:
 
         # 音声認識のログ
         self.path_asr_log = os.path.join(self.log_dir, 'asr.csv')
-        self.csv.write(self.path_asr_log, ['speaker', 'text'])
+        self.csv.write(self.path_asr_log, ['date', 'time', 'speaker', 'text'])
 
         # NLU結果とシステムの行動の履歴
         self.path_main_log = os.path.join(self.log_dir, 'main.csv')
         self.path_slot_log = os.path.join(self.log_dir, 'slot.csv')
         self.path_value_log = os.path.join(self.log_dir, 'value.csv')
-        self.csv.write(self.path_main_log, ['id', 'time', 'action', 'target', 'topic', 'command', 'state', 'type', 'done'])
+        self.csv.write(self.path_main_log, ['id', 'date', 'time', 'action', 'target', 'topic', 'command', 'state', 'type', 'done'])
         self.csv.write(self.path_slot_log, ['id', 'slot_key', 'slot_value'])
         self.csv.write(self.path_value_log, ['id', 'value'])
         self.id_cnt = 0
@@ -45,19 +45,21 @@ class LogManager:
         self.genre_cash_list = []
 
     def get_main_data_dict(self):
-        data_dict = {'id': None, 'time': None, 'action': None,
+        data_dict = {'id': None, 'date': None, 'time': None, 'action': None,
                      'target': None, 'topic': None, 'command': None,
                      'state': 0, 'type': 'passive', 'done': 0
                      }
 
         return data_dict
 
-    def write_asr_log(self, speaker, text):
-        self.csv.write(self.path_asr_log, [speaker, text])
+    def write_asr_log(self, date, time, speaker, text):
+        self.csv.write(self.path_asr_log, [date, time, speaker, text])
 
     def write(self, data_dict, slot, value_list):
         now = datetime.datetime.now()
-        time = now.strftime("%Y%m%d%H%M%S.") + "%d" % (now.microsecond / 10000)
+        now_str = now.strftime("%Y%m%d %H%M%S.") + "%d" % (now.microsecond / 10000)
+        date, time = now_str.split(" ")
+        data_dict['date'] = date
         data_dict['time'] = time
         id = str(self.id_cnt)
         data_dict['id'] = id
@@ -141,6 +143,11 @@ class LogManager:
 
     def set_genre(self, genre):
         self.genre_cash_list.append(genre)
+        data_dict = self.get_main_data_dict()
+        data_dict.update(action='change_genre', command='change_genre', type="correction", done=1)
+        slot = {"genre": genre}
+
+        id = self.write(data_dict, slot, [])
 
     def set_review(self, topic, review):
         self.topic_review_hitory_dict[topic].append(review)

@@ -62,10 +62,23 @@ class DB_API():
         df = self.sql_execute(sql_order, columns=columns)
         return df
 
+    # def get_crew(self, movie_id, job_id):
+    #     sql_order = "SELECT name_en, name_ja FROM person WHERE person_id = ANY (SELECT person_id FROM crew WHERE movie_id = '{}' and job_id = '{}')".format(movie_id, job_id)
+    #     columns = ["name_en", "name_ja"]
+    #     df = self.sql_execute(sql_order, columns=columns)
+    #     return df
+
     def get_crew(self, movie_id, job_id):
-        sql_order = "SELECT name_en, name_ja FROM person WHERE person_id = ANY (SELECT person_id FROM crew WHERE movie_id = '{}' and job_id = '{}')".format(movie_id, job_id)
-        columns = ["name_en", "name_ja"]
-        df = self.sql_execute(sql_order, columns=columns)
+        sql_order = "SELECT person_id, order_num FROM crew WHERE movie_id = '{}' and job_id = '{}'".format(movie_id, job_id)
+        columns = ["person_id", "order_num"]
+        df1 = self.sql_execute(sql_order, columns=columns)
+
+        sql_order = "SELECT person_id, name_en, name_ja FROM person WHERE person_id = ANY (SELECT person_id FROM crew WHERE movie_id = '{}' and job_id = '{}')".format(movie_id, job_id)
+        columns = ["person_id", "name_en", "name_ja"]
+        df2 = self.sql_execute(sql_order, columns=columns)
+
+        df = pd.merge(df1, df2, on='person_id')
+        df = df.sort_values('order_num', ascending=True)
         return df
 
     def get_tips(self, movie_id):

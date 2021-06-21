@@ -125,7 +125,6 @@ class RobotController:
                 for person_name in person_name_list:
                     self.dialog_manager.logger.set_person_cash(person_name)
 
-
     def main(self, date, time, target, text):
         """
         音声認識されるたびに動く
@@ -153,37 +152,37 @@ class RobotController:
         slot = {'title': title, 'history': None}
         self.active_command = self.dialog_manager.logger.get_not_used_active_command(mid)
 
-        # TODO: NLU
-        command = "recommendation"
-        slot = {"genre": 12, "person": None, "sort_by": None, "history": None}
-
-        # DM
-        output, id = self.dialog_manager.main(command, slot, target)
-        if 'topic' in output.keys():
-            topic = output['topic']
-            mid = output['mid']
-        else:
-            topic = None
-            mid = None
-
-        if 'person_list' in output.keys():
-            person_name_list = output['person_list']
-        else:
-            person_name_list = None
-
-        # NLG
-        utterance = self.nlg.generate(command, slot, output)
-
-        self.utterance_candidate = {'id': id, 'command': command, 'utterance': utterance,
-                                    'topic': topic, 'mid': mid, 'person_list': person_name_list}
-
-        self.look(target)
-        sys.stdout.write(YELLOW)
-        sys.stdout.write("\033[K")
-        sys.stdout.write("Robot: " + utterance + "\n")
-        sys.stdout.write("能動発話候補: " + self.active_command + "\n")
-        sys.stdout.write(END)
-
+        # # TODO: NLU
+        # command = "recommendation"
+        # slot = {"genre": 12, "person": None, "sort_by": None, "history": None}
+        #
+        # # DM
+        # output, id = self.dialog_manager.main(command, slot, target)
+        # if 'topic' in output.keys():
+        #     topic = output['topic']
+        #     mid = output['mid']
+        # else:
+        #     topic = None
+        #     mid = None
+        #
+        # if 'person_list' in output.keys():
+        #     person_name_list = output['person_list']
+        # else:
+        #     person_name_list = None
+        #
+        # # NLG
+        # utterance = self.nlg.generate(command, slot, output)
+        #
+        # self.utterance_candidate = {'id': id, 'command': command, 'utterance': utterance,
+        #                             'topic': topic, 'mid': mid, 'person_list': person_name_list}
+        #
+        # self.look(target)
+        # sys.stdout.write(YELLOW)
+        # sys.stdout.write("\033[K")
+        # sys.stdout.write("Robot: " + utterance + "\n")
+        # sys.stdout.write("能動発話候補: " + self.active_command + "\n")
+        # sys.stdout.write(END)
+        #
         topics = self.dialog_manager.logger.get_topic_history()
         persons = self.dialog_manager.logger.get_person_history()
         return topics, persons
@@ -266,12 +265,22 @@ class RobotController:
                 type = "active"
                 command = message
                 slot = {}
-
+                
             # 特殊応答系の訂正 ("tips", "review")
             elif message.replace("-correction", "", 1) in ["no", "yes", "unknown", "repeat"]:
                 type = "correction"
                 command = message.replace("-correction", "", 1)
                 slot = {}
+
+            elif message.replace("-correction", "", 1) == "title":
+                type = "correction"
+                command = message.replace("-correction", "", 1)
+                self.dialog_manager.logger.set_command(command)
+                title = self.dialog_manager.logger.get_topic_title()
+                if title is not None:
+                    slot = {"title": title}
+                else:
+                    return topics, persons
 
             # 人物詳細系の訂正 ("cast_detail", "directpr_detail")
             elif message.replace("-correction", "", 1) in ["cast_detail", "director_detail"]:
@@ -298,11 +307,18 @@ class RobotController:
                 else:
                     return topics, persons
 
+            else:
+                print(command)
+                raise NotImplementedError
+
             self.dialog_manager.logger.set_command(command)
             output, id = self.dialog_manager.main(command, slot, target, type=type)
             self.dialog_manager.logger.exec_log(id)
             self.set_cash(output)
 
+            if command == "repeat":
+                command = output["command"]
+                slot = output["slot"]
             utterance = self.nlg.generate(command, slot, output)
 
         if utterance is not None:

@@ -32,21 +32,26 @@ class NLG:
         7. review           slot: {"title": _, "history":_}, "~だったって"
         8. evaluation       slot: {"title": _}, "評価はが{score}点だよ"
         9. genre            slot: {"title": _}, "{genre}だよ"
-        10. pardon          slot: None, "もう一回言ってもらえますか？"
-        11. unknown         slot: None, "ちょっとわからないなぁ""
-        12.start            slot: None, "どんな映画が観たいですか？"
-        13.end              slot: None, "行ってらっしゃい"
-        14.yes              slot: None, "はい、そうです"
-        15.no               slot: None, "違います"
-        16.question         slot: {"title": _}, "XXは興味ありますか？"
-        17.sumarize         slot: NONE  "観に行く映画は決まりましたか？"
+        10. title           slot: {"title": _}, "タイトルは{title}だよ"
+        11. pardon          slot: None, "もう一回言ってもらえますか？"
+        12. unknown         slot: None, "ちょっとわからないなぁ""
+        13.start            slot: None, "どんな映画が観たいですか？"
+        14.end              slot: None, "行ってらっしゃい"
+        15.yes              slot: None, "はい、そうです"
+        16.no               slot: None, "違います"
+        17.question         slot: {"title": _}, "XXは興味ありますか？"
+        18.sumarize         slot: NONE  "観に行く映画は決まりましたか？"
         '''
 
         if 'recommendation' in command:
             if input['pron'] is not None:
                 utterance = "それでは、{}はどうでしょう".format(input['pron'])
             else:
-                utterance = "それでは、{}はどうでしょう".format(input['topic'])
+                if input['genre'] is not None:
+                    utterance = "すみません、{}の映画はもうこれ以上知りません".format(input['genre'])
+                else:
+                    utterance = "すみません、映画はこれ以上知りません"
+
 
         elif command == 'cast':
             if len(input['person_list']) > 0:
@@ -116,6 +121,9 @@ class NLG:
             else:
                 utterance = "すみません、{}は知りません".format(slot['title'])
 
+        elif command == 'title':
+            utterance = "タイトルは{}です".format(input['topic'])
+
         elif command == 'pardon':
             utterance = "すみません、もう一回言ってもらえますか"
 
@@ -140,7 +148,7 @@ class NLG:
             else:
                 utterance = "{}は見たいと思いますか".format(slot['title'])
 
-        elif command == 'sumarize':
+        elif command == 'summarize':
             utterance = "見に行く映画は決まりましたか"
 
         else:

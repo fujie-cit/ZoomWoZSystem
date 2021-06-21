@@ -8,6 +8,9 @@ class DM:
         self.config = config
         self.api = DB_API(self.config)
         self.logger = LogManager(self.config)
+        self.cash_output = None
+        self.cash_command = None
+        self.cash_slot = None
 
     def get_recommendation(self, slot, target, type='passive'):
         '''
@@ -33,11 +36,6 @@ class DM:
         else:
             df = self.api.search_movie()
 
-        if slot['history']:
-            # 履歴の参照
-            used_mid_list = self.logger.get_topic_history()
-            df = df[~df['movie_id'].isin(used_mid_list)]
-
         # 取得した映画群を条件でソート
         if slot['sort_by'] == 'eval_gt' or slot['sort_by'] == 'eval_lt' or slot['sort_by'] == 'eval_eq':
             # 一定の投票数以下の作品は除く
@@ -62,17 +60,32 @@ class DM:
             print("#############")
             df = df.sort_values('popularity', ascending=False)
 
+        if slot['history']:
+            N = int(self.config['DM']['N'])
+            df = df[:N]
+            # 履歴の参照
+            used_mid_list = self.logger.get_intoduced_mid_list()
+            df = df[~df['movie_id'].isin(used_mid_list)]
+
         if len(df) > 0:
             # ランダムに選ぶ
-            N = int(self.config['DM']['N'])
-            info = df[:N].sample()
-            topic = info['title'].iloc[0]
-            mid = info['movie_id'].iloc[0]
+            info = df.sample()
             pron = info['pronunciation'].iloc[0]
+            if pron is not None:
+                topic = pron
+            else:
+                topic = info['title'].iloc[0]
+            mid = info['movie_id'].iloc[0]
         else:
             topic = ''
             mid = None
             pron = None
+
+        gid = slot['genre']
+        if gid is None:
+            genre = None
+        else:
+            genre = self.api.id2genre(gid)
 
         # 対話履歴をセット
         data_dict = self.logger.get_main_data_dict()
@@ -81,7 +94,7 @@ class DM:
 
         id = self.logger.write(data_dict, slot, [topic])
 
-        output = {'topic': topic, 'mid': mid, 'pron': pron}
+        output = {'topic': topic, 'mid': mid, 'pron': pron, 'genre': genre}
         return output, id
 
     def get_cast(self, slot, target, type='passive'):
@@ -520,12 +533,60 @@ class DM:
         # 対話履歴をセット
         data_dict = self.logger.get_main_data_dict()
         data_dict.update(action='utter', target=target, topic=mid,
-                         command='genre', type=type)
+                         command='question', type=type)
 
         id = self.logger.write(data_dict, slot, [])
         output = {'topic': title, 'mid': mid}
         return output, id
 
+    def get_title(self, slot, target, type='correcrion'):
+        '''
+        slot: dict
+            key: title 映画タイトル
+        '''
+
+        title = slot['title']
+        title_list = self.logger.get_topic_history()
+        mid_list = self.logger.get_mid_history()
+        # すでに話題に上がっている場合
+        if title in title_list:
+            mid = mid_list[title_list.index(title)]
+        # 話題に上がっていない場合
+        else:
+            mid = None
+
+        # 対話履歴をセット
+        data_dict = self.logger.get_main_data_dict()
+        data_dict.update(action='utter', target=target, topic=mid,
+                         command='title', type=type)
+
+        id = self.logger.write(data_dict, slot, [])
+        output = {'topic': title, 'mid': mid}
+        return output, id
+
+
+    def get_repeat(self, slot, target, type='correction'):
+        '''
+        slot: dict
+            key:
+        '''
+
+        mid_list = self.logger.get_mid_history()
+        if len(mid_list)>0:
+            mid = mid_list[-1]
+        else:
+            mid = None
+
+        # 対話履歴をセット
+        data_dict = self.logger.get_main_data_dict()
+        data_dict.update(action='utter', target=target, topic=mid,
+                         command='repeat', type=type)
+
+        id = self.logger.write(data_dict, slot, [])
+        output = self.cash_output
+        output["command"] = self.cash_command
+        output["slot"] = self.cash_slot
+        return output, id
 
     def main(self, command, slot, target, type='passive'):
         '''
@@ -591,7 +652,13 @@ class DM:
         elif command == 'question':
             output, id = self.get_question(slot, target, type)
 
-        elif command in ["yes", "no", "start", "end", "sumarize"]:
+        elif command == 'title':
+            output, id = self.get_title(slot, target, type)
+
+        elif command == 'repeat':
+            output, id = self.get_repeat(slot, target, type)
+
+        elif command in ["yes", "no", "unknown", "start", "end", "summarize"]:
             # 対話履歴をセット
             data_dict = self.logger.get_main_data_dict()
             data_dict.update(action='utter', target=target, command=command, type=type)
@@ -601,5 +668,9 @@ class DM:
         else:
             id = None
             output = {}
+
+        self.cash_output = output
+        self.cash_command = command
+        self.cash_slot = slot
 
         return output, id

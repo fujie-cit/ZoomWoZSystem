@@ -32,7 +32,7 @@ class LogManager:
         self.path_main_log = os.path.join(self.log_dir, 'main.csv')
         self.path_slot_log = os.path.join(self.log_dir, 'slot.csv')
         self.path_value_log = os.path.join(self.log_dir, 'value.csv')
-        self.csv.write(self.path_main_log, ['id', 'date', 'time', 'action', 'target', 'topic', 'command', 'state', 'type', 'done'])
+        self.csv.write(self.path_main_log, ['id', 'date', 'time', 'action', 'target', 'topic', 'command', 'state', 'type', 'done'])  # state: 答えが複数ある場合すべて回答した:1 まだ回答していないものがある:0
         self.csv.write(self.path_slot_log, ['id', 'slot_key', 'slot_value'])
         self.csv.write(self.path_value_log, ['id', 'value'])
         self.id_cnt = 0
@@ -102,6 +102,19 @@ class LogManager:
         id_list = df_main['id'].tolist()
         df_value = df_value[df_value['id'].isin(id_list)]
         introduced_list = df_value['value'].tolist()
+        return introduced_list
+
+    def get_intoduced_mid_list(self):
+        '''
+        commandごとの履歴検索
+        param: id csvのカラム「topic」に記録しているmid (int)
+        return: movie_idのリスト (list)
+        '''
+        df_main = self.read(self.path_main_log)
+        df_value = self.read(self.path_value_log)
+        df_main = df_main[df_main['command'] == "recommendation"]
+        df_main = df_main[df_main['done'] == 1]
+        introduced_list = df_main['topic'].tolist()
         return introduced_list
 
     def get_not_used_active_command(self, mid):

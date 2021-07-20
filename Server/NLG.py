@@ -44,6 +44,7 @@ class NLG:
         '''
 
         if 'recommendation' in command:
+            print(input)
             if input['pron'] is not None:
                 utterance = "それでは、{}はどうでしょう".format(input['pron'])
             else:
@@ -72,7 +73,8 @@ class NLG:
                     utterance = "すみません、{}が出演している映画は{}以外知りません".format(slot['person'], input['topic'])
                 elif input['topic'] is not None:
                     title_list = input['cast_detail']
-                    title_list.remove(input['topic'])
+                    if input['topic'] in title_list:
+                        title_list.remove(input['topic'])
                     text = 'や'.join(title_list)
                     utterance = "{}に出演しています".format(text)
                 else:
@@ -86,7 +88,8 @@ class NLG:
                     utterance = "すみません、{}が手がけた映画は{}以外知りません".format(slot['person'], input['topic'])
                 elif input['topic'] is not None:
                     title_list = input['director_detail']
-                    title_list.remove(input['topic'])
+                    if input['topic'] in title_list:
+                        title_list.remove(input['topic'])
                     text = 'や'.join(title_list)
                     utterance = "{}を手がけています".format(text)
                 else:

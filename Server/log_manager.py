@@ -28,6 +28,8 @@ class LogManager:
         self.path_asr_log = os.path.join(self.log_dir, 'asr.csv')
         self.csv.write(self.path_asr_log, ['date', 'time', 'speaker', 'text'])
 
+        self.path_system_utterance_log = os.path.join(self.log_dir, 'system_utterance.csv')
+
         # NLU結果とシステムの行動の履歴
         self.path_main_log = os.path.join(self.log_dir, 'main.csv')
         self.path_slot_log = os.path.join(self.log_dir, 'slot.csv')
@@ -54,6 +56,10 @@ class LogManager:
 
     def write_asr_log(self, date, time, speaker, text):
         self.csv.write(self.path_asr_log, [date, time, speaker, text])
+
+    def write_system_utterance_log(self, time_list):
+        df = pd.DataFrame({"start": time_list})
+        df.to_csv(self.path_system_utterance_log, encoding='utf-8-sig', index=False)
 
     def write(self, data_dict, slot, value_list):
         now = datetime.datetime.now()

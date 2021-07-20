@@ -1,5 +1,10 @@
 import MySQLdb
 import pandas as pd
+import re
+
+
+def is_japanese(str):
+    return True if re.search(r'[ぁ-んァ-ン]', str) else False
 
 
 class DB_API():
@@ -12,6 +17,7 @@ class DB_API():
     def sql_execute(self, sql_order, columns):
         connector = MySQLdb.connect(host=self.host, db=self.db_name, user=self.user, passwd=self.passwd, use_unicode=True, charset="utf8")
         cursor = connector.cursor()
+        df = None
         try:
             cursor.execute(sql_order)
             result = cursor.fetchall()
@@ -94,13 +100,16 @@ class DB_API():
         return df
 
     def get_credit(self, person_id):
-        sql_order = "SELECT title FROM main WHERE movie_id = ANY (SELECT movie_id FROM crew WHERE person_id = '{}')".format(person_id)
-        columns = ["title"]
+        sql_order = "SELECT title, pronunciation FROM main WHERE movie_id = ANY (SELECT movie_id FROM crew WHERE person_id = '{}')".format(person_id)
+        columns = ["title", "pron"]
         df = self.sql_execute(sql_order, columns=columns)
         return df
 
     def person2id(self, person):
-        sql_order = "SELECT person_id FROM person WHERE name_en = '{}'".format(person)
+        if is_japanese(person):
+            sql_order = "SELECT person_id FROM person WHERE name_ja = '{}'".format(person)
+        else:
+            sql_order = "SELECT person_id FROM person WHERE name_en = '{}'".format(person)
         columns = ["person_id"]
         df = self.sql_execute(sql_order, columns=columns)
         if len(df) > 0:

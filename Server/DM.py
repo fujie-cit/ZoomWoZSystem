@@ -58,6 +58,7 @@ class DM:
 
         else:
             print("#############")
+            df = df.dropna(subset=['pronunciation'])
             df = df.sort_values('popularity', ascending=False)
 
         if slot['history']:
@@ -210,13 +211,17 @@ class DM:
         if pid is not None:
             df = self.api.get_credit(pid)
             topic_list = df['title'].tolist()
-
+            pron_list = df['pron'].tolist()
             N = int(self.config['DM']['cast_detail_num'])
             if slot['history']:
                 introduced_cast_detail_list = self.logger.get_intoduced_list('cast_detail', pid)
                 cnt = 0
                 topic_list_new = []
-                for topic in topic_list:
+                for i in range(len(topic_list)):
+                    if pron_list[i] is not None:
+                        topic = pron_list[i]
+                    else:
+                        topic = topic_list[i]
                     if topic not in introduced_cast_detail_list:
                         topic_list_new.append(topic)
                         cnt += 1
@@ -245,14 +250,12 @@ class DM:
 
         id = self.logger.write(data_dict, slot, topic_list_new)
 
-        if self.logger.get_topic_title() in topic_list_new:
-            topic = self.logger.get_topic_title()
-            mid = self.logger.get_topic_mid()
-        else:
-            topic = None
-            mid = None
+
+        topic = self.logger.get_topic_title()
+        mid = self.logger.get_topic_mid()
 
         output = {'cast_detail': topic_list_new, 'topic': topic, 'mid': mid}
+        print(output)
         return output, id
 
     def get_director_detail(self, slot, target, type='passive'):
@@ -298,12 +301,9 @@ class DM:
                          command='director_detail', state=state, type=type)
         id = self.logger.write(data_dict, slot, topic_list_new)
 
-        if self.logger.get_topic_title() in topic_list_new:
-            topic = self.logger.get_topic_title()
-            mid = self.logger.get_topic_mid()
-        else:
-            topic = None
-            mid = None
+
+        topic = self.logger.get_topic_title()
+        mid = self.logger.get_topic_mid()
 
         output = {'director_detail': topic_list_new, 'topic': topic, 'mid': mid}
         return output, id

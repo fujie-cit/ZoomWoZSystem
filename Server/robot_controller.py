@@ -48,6 +48,7 @@ class RobotController:
 
         # 音声認識を別スレッドで開始する
         self.stt.start()
+        self.look('c')
 
     def look(self, target):
         if target != self.curr_target:
@@ -199,6 +200,10 @@ class RobotController:
           topic_list: list(str) ... トピックの履歴の1次元リスト
         """
 
+        now = datetime.datetime.now()
+        now_str = now.strftime("%Y%m%d %H%M%S.") + "%d" % (now.microsecond / 10000)
+        date, start = now_str.split(" ")
+
         utterance = None
         # 現状のHTMLの引数を取得しておく(誤操作などで更新がない場合はこれを返す)
         topics = self.dialog_manager.logger.get_topic_history()
@@ -265,7 +270,7 @@ class RobotController:
                 type = "active"
                 command = message
                 slot = {}
-                
+
             # 特殊応答系の訂正 ("tips", "review")
             elif message.replace("-correction", "", 1) in ["no", "yes", "unknown", "repeat"]:
                 type = "correction"
@@ -332,11 +337,12 @@ class RobotController:
         sound_data = self.tts.generate(utterance)
         run_action_player.sound_player.put(sound_data)
 
+
         # 発話ログ
-        now = datetime.datetime.now()
-        now_str = now.strftime("%Y%m%d %H%M%S.") + "%d" % (now.microsecond / 10000)
-        date, time = now_str.split(" ")
-        self.dialog_manager.logger.write_asr_log(date, time, "U", utterance)
+        self.dialog_manager.logger.write_asr_log(date, start, "U", utterance)
+        if command == "end":
+            start_list = run_action_player.sound_player.get_time_list()
+            self.dialog_manager.logger.write_system_utterance_log(start_list)
 
         # 能動発話候補をあらかじめ算出しておく
         title = self.dialog_manager.logger.get_topic_title()

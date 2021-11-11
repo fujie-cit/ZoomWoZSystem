@@ -143,13 +143,31 @@ class SpeechRecognitionApplication(WebSocketApplication):
 def index():
     return render_template('index.html')
 
-WebSocketServer(
-    ('0.0.0.0', 8000),
+# ポート番号
+#   本番環境では80番にする．
+#   ただしセキュリティ上の問題でクライアント側でマイクをオンに
+#   できない現象を確認したので本番環境はSSLを使う必要があると思われる．
+port = 80
 
+
+# SSL設定
+#   実行ディレクトリに fullchain.pem と privkey.pem があれば
+#   SSLにする．
+import os
+if os.path.exists("fullchain.pem") and os.path.exists("privkey.pem"):
+    ssl_settings = dict(certfile="fullchain.pem",
+                        keyfile="privkey.pem")
+    port=443
+else:
+    ssl_settings = dict()
+
+server = WebSocketServer(
+    ('0.0.0.0', port),
     Resource([
         ('^/websocket', SpeechRecognitionApplication),
         ('^/.*', DebuggedApplication(flask_app))
     ]),
-
-    debug=False
-).serve_forever()
+    debug=True,
+    **ssl_settings
+)
+server.serve_forever()

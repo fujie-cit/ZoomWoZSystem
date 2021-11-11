@@ -1,0 +1,30 @@
+<!doctype html>
+<head>
+    <meta charset="utf-8"/>
+    <title>WebSocket Chat Example</title>
+    <style>
+        li {
+            list-style: none;
+        }
+    </style>
+    <script type=text/javascript>
+        $SCRIPT_ROOT =
+        {{ request.script_root|tojson|safe }}
+    </script>
+</head>
+<body>
+<h2>WebSocket Speech Recognition Example</h2>
+<form>
+    <input type="text" value="fujie" id="login_user_name"/>
+    <input type="button" value="ログイン" id="login_button"/>
+</form>
+
+<br>
+<button type="button" id="start">音声入力開始</button>
+<div id="messages"></div>
+</body>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+<script src="{{ url_for('static', filename='js/stt.js') }}"></script>
+</html>

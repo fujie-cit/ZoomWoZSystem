@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>JavaScript サンプル：webkitSpeechRecognition による音声入力</title>
+    <style>
+/** 例示用のスタイル */
+html {
+    font-size: 62.5%;
+}
+body {
+    max-width: 980px;
+    margin: auto;
+    padding: 15px;
+    font-size: 1.4rem;
+    font-family: sans-serif;
+}
+
+#result, #log {
+    box-sizing: border-box;
+    width: 100%;
+    height: 200px;
+}
+    </style>
+</head>
+<body>
+    <h1>JavaScript サンプル：webkitSpeechRecognition による音声入力</h1>
+    <p>「音声入力開始」ボタンで音声入力を行います。</p>
+    <ul>
+        <li>Chrome のみで動作します (2019/02時点)。</li>
+        <li>入力を継続しないケース (無音になると音声入力を終了する) のサンプルです。</li>
+    </ul>
+
+    <button type="button" id="start">音声入力開始</button>
+
+    <h2>入力結果</h2>
+    <textarea name="result" id="result"></textarea>
+
+    <h2>ログ</h2>
+    <textarea name="log" id="log"></textarea>
+
+    <script>
+(function(){
+    // 結果出力
+    const writeResult = function(x) {
+        const resultArea = document.getElementById('result');
+        resultArea.value += x + '\n';
+    }
+    // ログ出力
+    const writeLog = function(x) {
+        const logArea = document.getElementById('log');
+        logArea.value += '[' + new Date().toLocaleString() + '] ' + JSON.stringify(x) + '\n';
+    };
+
+    let error = false; // webkitSpeechRecognition が使えない
+    let recognizing = false; // 音声入力中か
+    let recognitionValue = ''; // 文字起こしされたテキスト
+    try {
+
+        recognition = new webkitSpeechRecognition();
+        recognition.lang = 'ja'; // 日本語
+        recognition.continuous = false; // 継続しない
+
+        // エラー時
+        recognition.onerror = function(e){
+            writeLog('onerror');
+            writeLog(e.error);
+
+            recognizing = false;
+        };
+        // 音声結果取得時
+        recognition.onresult = function(e){
+            writeLog('onresult');
+
+            for (var i = e.resultIndex; i < e.results.length; ++i) {
+                if (e.results[i].isFinal) {
+                    recognitionValue += e.results[i][0].transcript;
+                }
+            }
+        };
+        // 音声入力終了時 (エラー終了時含む)
+        recognition.onend = function(){
+            writeLog('onend');
+
+            if (recognizing) {
+                recognizing = false;
+                writeResult(recognitionValue);
+                recognitionValue = '';
+            }
+
+            document.getElementById('start').disabled = false;
+        };
+        recognition.onsoundstart = function() { writeLog('onsoundstart'); }; // 音声認識開始時
+        recognition.onsoundend = function() { writeLog('onsoundend'); }; // 音声認識終了時 (onresult より前に発生)
+        recognition.onnomatch = function() { writeLog('onnomatch'); }; // 認識なし
+    }
+    catch (e) {
+        error = true;
+    }
+
+    // ボタン
+    document.addEventListener('click', function(e){
+        if (e.target.id == 'start') {
+            if (error) {
+                alert('今閲覧中のブラウザではでは動作しません。');
+                return;
+            }
+
+            e.target.disabled = true;
+
+            recognizing = true;
+            recognition.start();
+            writeLog('start');
+        }
+    });
+})();
+    </script>
+</body>
+</html>

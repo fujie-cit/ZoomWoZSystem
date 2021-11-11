@@ -1,4 +1,5 @@
-python-socketio
+flask
 mysqlclient
 websocket-client
+gevent-websocket
 google-cloud-texttospeech

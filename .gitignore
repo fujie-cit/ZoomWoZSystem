@@ -2,4 +2,11 @@ ServerLog/
 data/
 Server/notebooks
 Server/config/dialogsys-d40df3777fed.json
+Server/config/fujielab-gcp-cd1751295cc9.json
 .ipynb_checkpoints/
+Server/config_
+Server/tts/cache/*.wav
+Server/tts/cache/tts.txt
+.DS_Store
+__pycache__
+

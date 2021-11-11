@@ -37,12 +37,17 @@
 }
 
 .buttonB {
-    width:220px;
-    height:70px;
-    font-size: 2.0em;
-    font-weight: bold;
+  width:220px;
+  height:70px;
+  font-size: 1.8em;
+  font-weight: bold;
 	background-color: #4169e1;
 	color: #fff;
+  overflow-wrap: break-word;
+  word-break: break-all;
+  word-wrap: break-word;
+  white-space: normal;
+  vertical-align: middle;
 }
 .buttonB:hover {
 	background-color: #00008b;
@@ -67,18 +72,31 @@
 }
 
 .buttonD {
-    /* width:120px;
-    height:90px; */
-    width:100px;
-    height:70px;
-    font-size: 2.0em;
-    font-weight: bold;
-	background-color: #d2691e;
-	color: #fff;
-  border-bottom: solid 6px #8C4545;
-  border-right: solid 6px #8C4545;/*ボタン色より暗めに*/
+  /* width:120px;
+  height:90px; */
+  width:100px;
+  height:70px;
+  font-size: 2.0em;
+  font-weight: bold;
+background-color: #d2691e;
+color: #fff;
+border-bottom: solid 6px #8C4545;
+border-right: solid 6px #8C4545;/*ボタン色より暗めに*/
+border-radius: 1.5px;
+}
+
+.buttonM {
+  width:100px;
+  height:50px;
+  font-size: 2.0em;
+  font-weight: bold;
+  background-color: #aaaaaa;
+  color: #fff;
+  border-bottom: solid 6px #bbbbbb;
+  border-right: solid 6px #999999;/*ボタン色より暗めに*/
   border-radius: 1.5px;
 }
+
 .buttonD:hover {
 	background-color: #daa520;
 }

@@ -60,7 +60,7 @@ class SoundPlay:
         self._p = pa.PyAudio()
         self._stream = self._p.open (format=pa.paInt16,
                                      channels=1,
-                                     rate=24000,
+                                     rate=32000,
                                      output=True,
                                      frames_per_buffer=SoundPlay.CHUNK,
                                      stream_callback=self.callback)
@@ -72,7 +72,7 @@ class SoundPlay:
         self._data = None
         self._duration_list = None
         self.duration = 0.4
-        self.sample_rate = 16000
+        self.sample_rate = 32000
         self._pos = 0
 
         # リップシンク制御用

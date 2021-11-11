@@ -1,10 +1,11 @@
 # coding:utf-8
 __editor__ = "Jin Sakuma"
 from flask import Flask, render_template, request
-from robot_controller import RobotController
+# from robot_controller import RobotController
+from woz_system.woz_controller import WoZController 
 import sys
-import logging
-import logging.handlers
+# import logging
+# import logging.handlers
 
 
 app = Flask(__name__)
@@ -21,71 +22,51 @@ app = Flask(__name__)
 host = 'localhost'
 port = 8080
 app = Flask(__name__)
-rc = RobotController()
+# rc = RobotController()
 topic_history_length = 6
-
+woz_controller = WoZController()
 
 @app.route('/')
 def index():
     return render_template('index.html')
 
-@app.route('/stt', methods=['POST'])
-def stt():
-    date = request.form['date']
-    time = request.form['time']
-    text = request.form['text']
-    user = request.form['user']
-    topics, persons = rc.main(date, time, user, text)
+# @app.route('/stt', methods=['POST'])
+# def stt():
+#     date = request.form['date']
+#     time = request.form['time']
+#     text = request.form['text']
+#     user = request.form['user']
+#     topics, persons = rc.main(date, time, user, text)
 
-    while len(topics) < topic_history_length:
-        topics.append('NONE')
-        persons.append('NONE')
-    while len(topics) > topic_history_length:
-        topics.pop(0)
-        persons.pop(0)
+#     while len(topics) < topic_history_length:
+#         topics.append('NONE')
+#         persons.append('NONE')
+#     while len(topics) > topic_history_length:
+#         topics.pop(0)
+#         persons.pop(0)
 
-    message_dic = {}
-    message_dic['topics'] = topics
-    message_dic['person'] = persons
+#     message_dic = {}
+#     message_dic['topics'] = topics
+#     message_dic['person'] = persons
 
-    return render_template('index.html', message=message_dic)
+#     return render_template('index.html', message=message_dic)
 
 
 @app.route('/send/<command>/<detail>', methods=['POST'])
 def push_button(command, detail):
-    # command = command.encode('utf-8')
-    # detail = detail.encode('utf-8')
-    if command == 'look':
-        topics, persons = rc.look(detail)
-    elif command == 'nod':
-        topics, persons = rc.nod(detail)
-    elif command == 'cancel':
-        topics, persons = rc.look(target='U')
-    elif command == 'change-topic':
-        topics, persons = rc.change_topic_title(detail)
-    elif command == 'change-person':
-        topics, persons = rc.change_topic_person(detail)
-    elif command == 'change-genre':
-        topics, persons = rc.change_genre(detail, "U")
-    else:
-        topics, persons = rc.utter(command, detail)
+    woz_controller.execute(command, detail)
 
-    while len(topics) < topic_history_length:
-        topics.append('NONE')
-    while len(topics) > topic_history_length:
-        topics.pop(0)
-    while len(persons) < topic_history_length:
-        persons.append('NONE')
-    while len(persons) > topic_history_length:
-        persons.pop(0)
+    title_list, person_list = woz_controller.get_latest_information()
 
-    message_dic = {}
-    message_dic['topics'] = topics
-    message_dic['person'] = persons
+    title_list.extend(['None'] * topic_history_length)
+    title_list = title_list[:topic_history_length]
+    person_list.extend(['None'] * topic_history_length)
+    person_list = person_list[:topic_history_length]
+    message_dict = dict(
+        topics=title_list, person=person_list
+    )
 
-    # active = '監督'
-    return render_template('index.html', message=message_dic)
-
+    return render_template('index.html', message=message_dict)
 
 if __name__ == '__main__':
     app.run(debug=False, host=host, port=port, threaded=True)

@@ -5,6 +5,20 @@
 	<link rel="stylesheet" href="client_new.css">
 </head> -->
 <body>
+	<div class="box2">
+		<table class="table2" border=2 align="center" width="330">
+		<tr><td>
+			<form method="post" action="/send/start_dialog-meta/U" style="display: inline">
+				<input type="submit" value="対話開始" class="buttonM">
+			</form>
+			<form method="post" action="/send/finish_dialog-meta/U" style="display: inline">
+				<input type="submit" value="対話終了" class="buttonM">
+			</form>
+		</td></tr>
+	</table>
+	</div>
+
+
   <div class="box1">
 		<table border=2 align="center" width="1200">
 		<!-- <tr><td>
@@ -12,77 +26,77 @@
     </td></tr> -->
 		<tr><td>
 			{% if message %}
-					<form method="post" action="/send/change-topic/{{ message.topics[0] }}" style="display: inline">
-							<input type="submit" value={{ message.topics[0] }} class="buttonB" size="70">
+					<form method="post" action="/send/change_topic-meta/{{ message.topics[0] }}" style="display: inline;">
+							<input type="submit" value="{{ message.topics[0] }}" class="buttonB">
 					</form>
-					<form method="post" action="/send/change-topic/{{ message.topics[1] }}" style="display: inline">
-							<input type="submit" value={{ message.topics[1] }} class="buttonB">
+					<form method="post" action="/send/change_topic-meta/{{ message.topics[1] }}" style="display: inline">
+							<input type="submit" value="{{ message.topics[1] }}" class="buttonB">
 					</form>
-					<form method="post" action="/send/change-topic/{{ message.topics[2] }}" style="display: inline">
-							<input type="submit" value={{ message.topics[2] }} class="buttonB">
+					<form method="post" action="/send/change_topic-meta/{{ message.topics[2] }}" style="display: inline">
+							<input type="submit" value="{{ message.topics[2] }}" class="buttonB">
 					</form>
-					<form method="post" action="/send/change-topic/{{ message.topics[3] }}" style="display: inline">
-							<input type="submit" value={{ message.topics[3] }} class="buttonB">
+					<form method="post" action="/send/change_topic-meta/{{ message.topics[3] }}" style="display: inline">
+							<input type="submit" value="{{ message.topics[3] }}" class="buttonB">
 					</form>
-					<form method="post" action="/send/change-topic/{{ message.topics[4] }}" style="display: inline">
-							<input type="submit" value={{ message.topics[4] }} class="buttonB">
+					<form method="post" action="/send/change_topic-meta/{{ message.topics[4] }}" style="display: inline">
+							<input type="submit" value="{{ message.topics[4] }}" class="buttonB">
 					</form>
-					<form method="post" action="/send/change-person/{{ message.person[0] }}" style="display: inline">
-							<input type="submit" value={{ message.person[0] }} class="buttonB">
+					<form method="post" action="/send/change_person-meta/{{ message.person[0] }}" style="display: inline">
+							<input type="submit" value="{{ message.person[0] }}" class="buttonB">
 					</form>
-					<form method="post" action="/send/change-person/{{ message.person[1] }}" style="display: inline">
-							<input type="submit" value={{ message.person[1] }} class="buttonB">
+					<form method="post" action="/send/change_person-meta/{{ message.person[1] }}" style="display: inline">
+							<input type="submit" value="{{ message.person[1] }}" class="buttonB">
 					</form>
-					<form method="post" action="/send/change-person/{{ message.person[2] }}" style="display: inline">
-							<input type="submit" value={{ message.person[2] }} class="buttonB">
+					<form method="post" action="/send/change_person-meta/{{ message.person[2] }}" style="display: inline">
+							<input type="submit" value="{{ message.person[2] }}" class="buttonB">
 					</form>
-					<form method="post" action="/send/change-person/{{ message.person[3] }}" style="display: inline">
-							<input type="submit" value={{ message.person[3] }} class="buttonB">
+					<form method="post" action="/send/change_person-meta/{{ message.person[3] }}" style="display: inline">
+							<input type="submit" value="{{ message.person[3] }}" class="buttonB">
 					</form>
-					<form method="post" action="/send/change-person/{{ message.person[4] }}" style="display: inline">
-							<input type="submit" value={{ message.person[4] }} class="buttonB">
+					<form method="post" action="/send/change_person-meta/{{ message.person[4] }}" style="display: inline">
+							<input type="submit" value="{{ message.person[4] }}" class="buttonB">
 					</form>
-					<!-- <form method="post" action="/send/change-topic/{{ message.topics[10] }}" style="display: inline">
+					<!-- <form method="post" action="/send/change_topic-meta/{{ message.topics[10] }}" style="display: inline">
 							<input type="submit" value={{ message.topics[10] }} class="buttonB">
 					</form>
-					<form method="post" action="/send/change-topic/{{ message.topics[11] }}" style="display: inline">
+					<form method="post" action="/send/change_topic-meta/{{ message.topics[11] }}" style="display: inline">
 							<input type="submit" value={{ message.topics[11] }} class="buttonB">
 					</form> -->
 			{% else %}
-					<form method="post" action="/send/change-topic/topic1" style="display: inline">
+					<form method="post" action="/send/change_topic-meta/topic1" style="display: inline">
 							<input type="submit" value="None" class="buttonB">
 					</form>
-					<form method="post" action="/send/change-topic/topic2" style="display: inline">
+					<form method="post" action="/send/change_topic-meta/topic2" style="display: inline">
 							<input type="submit" value="None" class="buttonB">
 					</form>
-					<form method="post" action="/send/change-topic/topic3" style="display: inline">
+					<form method="post" action="/send/change_topic-meta/topic3" style="display: inline">
 							<input type="submit" value="None" class="buttonB">
 					</form>
-					<form method="post" action="/send/change-topic/topic4" style="display: inline">
+					<form method="post" action="/send/change_topic-meta/topic4" style="display: inline">
 							<input type="submit" value="None" class="buttonB">
 					</form>
-					<form method="post" action="/send/change-topic/topic5" style="display: inline">
+					<form method="post" action="/send/change_topic-meta/topic5" style="display: inline">
 							<input type="submit" value="None" class="buttonB">
 					</form>
-					<form method="post" action="/send/change-topic/topic6" style="display: inline">
+					<form method="post" action="/send/change_topic-meta/topic6" style="display: inline">
 							<input type="submit" value="None" class="buttonB">
 					</form>
-					<form method="post" action="/send/change-topic/topic7" style="display: inline">
+					<form method="post" action="/send/change_topic-meta/topic7" style="display: inline">
 							<input type="submit" value="None" class="buttonB">
 					</form>
-					<form method="post" action="/send/change-topic/topic8" style="display: inline">
+					<form method="post" action="/send/change_topic-meta/topic8" style="display: inline">
 							<input type="submit" value="None" class="buttonB">
 					</form>
-					<form method="post" action="/send/change-topic/topic9" style="display: inline">
+					<form method="post" action="/send/change_topic-meta/topic9" style="display: inline">
 							<input type="submit" value="None" class="buttonB">
 					</form>
-					<form method="post" action="/send/change-topic/topic10" style="display: inline">
+					<form method="post" action="/send/change_topic-meta/topic10" style="display: inline">
 							<input type="submit" value="None" class="buttonB">
 					</form>
-					<!-- <form method="post" action="/send/change-topic/topic11" style="display: inline">
+					<!-- <form method="post" action="/send/change_topic-meta/topic11" style="display: inline">
 							<input type="submit" value="None" class="buttonB">
 					</form>
-					<form method="post" action="/send/change-topic/topic12" style="display: inline">
+					<form method="post" action="/send/change_topic-meta/topic12" style="display: inline">
 							<input type="submit" value="None" class="buttonB"> -->
 					</form>
 			{% endif %}
@@ -94,7 +108,6 @@
 		<tr><td>
 				<center id ='genre_btn'>
 					<input type="submit" value="ジャンル詳細" class='buttonG' id="genre_detail">
-
 				</center>
 		</td></tr>
 	</table>
@@ -102,90 +115,89 @@
 	<div id='genre'>
 		<table class="table2" border=2 align="center" height="50" width="1200">
 		<tr><td>
-				<form method="post" action="/send/change-genre/28" style="display: inline">
+				<form method="post" action="/send/change_genre-meta/28" style="display: inline">
 						<input type="submit" value="アクション" class="buttonE2">
 				</form>
-        <form method="post" action="/send/change-genre/12" style="display: inline">
+        <form method="post" action="/send/change_genre-meta/12" style="display: inline">
 						<input type="submit" value="アドベンチャー" class="buttonE2">
 				</form>
-        <form method="post" action="/send/change-genre/16" style="display: inline">
+        <form method="post" action="/send/change_genre-meta/16" style="display: inline">
 						<input type="submit" value="アニメ" class="buttonE2">
 				</form>
-        <form method="post" action="/send/change-genre/35" style="display: inline">
+        <form method="post" action="/send/change_genre-meta/35" style="display: inline">
 						<input type="submit" value="コメディー" class="buttonE2">
 				</form>
-				<form method="post" action="/send/change-genre/80" style="display: inline">
+				<form method="post" action="/send/change_genre-meta/80" style="display: inline">
 						<input type="submit" value="犯罪" class="buttonE2">
 				</form>
-				<form method="post" action="/send/change-genre/99" style="display: inline">
+				<form method="post" action="/send/change_genre-meta/99" style="display: inline">
 						<input type="submit" value="ドキュメンタリー" class="buttonE2">
 				</form>
-        <form method="post" action="/send/change-genre/18" style="display: inline">
+        <form method="post" action="/send/change_genre-meta/18" style="display: inline">
             <input type="submit" value="ドラマ" class="buttonE2">
         </form>
-        <form method="post" action="/send/change-genre/10751" style="display: inline">
+        <form method="post" action="/send/change_genre-meta/10751" style="display: inline">
 						<input type="submit" value="ファミリー" class="buttonE2">
 				</form>
-        <form method="post" action="/send/change-genre/14" style="display: inline">
+        <form method="post" action="/send/change_genre-meta/14" style="display: inline">
 						<input type="submit" value="ファンタジー" class="buttonE2">
 				</form>
-        <form method="post" action="/send/change-genre/36" style="display: inline">
+        <form method="post" action="/send/change_genre-meta/36" style="display: inline">
 						<input type="submit" value="ヒストリー" class="buttonE2">
 				</form>
-        <form method="post" action="/send/change-genre/27" style="display: inline">
+        <form method="post" action="/send/change_genre-meta/27" style="display: inline">
 						<input type="submit" value="ホラー" class="buttonE2">
 				</form>
-        <form method="post" action="/send/change-genre/10402" style="display: inline">
+        <form method="post" action="/send/change_genre-meta/10402" style="display: inline">
 						<input type="submit" value="ミュージカル" class="buttonE2">
 				</form>
-				<form method="post" action="/send/change-genre/9648" style="display: inline">
+				<form method="post" action="/send/change_genre-meta/9648" style="display: inline">
 						<input type="submit" value="ミステリー" class="buttonE2">
 				</form>
-        <form method="post" action="/send/change-genre/10749" style="display: inline">
+        <form method="post" action="/send/change_genre-meta/10749" style="display: inline">
 						<input type="submit" value="恋愛" class="buttonE2">
 				</form>
-        <form method="post" action="/send/change-genre/878" style="display: inline">
+        <form method="post" action="/send/change_genre-meta/878" style="display: inline">
 						<input type="submit" value="SF" class="buttonE2">
 				</form>
-        <form method="post" action="/send/change-genre/53" style="display: inline">
+        <form method="post" action="/send/change_genre-meta/53" style="display: inline">
 						<input type="submit" value="スリラー" class="buttonE2">
 				</form>
-        <form method="post" action="/send/change-genre/10752" style="display: inline">
+        <form method="post" action="/send/change_genre-meta/10752" style="display: inline">
 						<input type="submit" value="戦争" class="buttonE2">
 				</form>
-        <form method="post" action="/send/change-genre/37" style="display: inline">
+        <form method="post" action="/send/change_genre-meta/37" style="display: inline">
 						<input type="submit" value="洋画" class="buttonE2">
 				</form>
 		</tr></td>
 		</table>
 	</div>
 
-
 	<div>
 		<div class="box4">
 			<table class="table2" border=2 align="right"  width="640">
-		    <tr><td>
-		        <p align="center">参加者 A</p>
-		    </td></tr>
-		    <tr><td>
-		        <form method="post" action="/send/look/A" style="display: inline">
+				<tr><td>
+					<p align="center">参加者 A</p>
+					</td></tr>
+				<tr><td>
+		        <form method="post" action="/send/look-action/A" style="display: inline">
 		            <input type="submit" value="Look" class="buttonD">
 		        </form>
-		        <form method="post" action="/send/nod/A" style="display: inline">
+		        <form method="post" action="/send/nod-action/A" style="display: inline">
 		            <input type="submit" value="Nod" class="buttonD">
 		        </form>
-		        <form method="post" action="/send/start/A" style="display: inline">
+		        <form method="post" action="/send/start-active/A" style="display: inline">
 		            <input type="submit" value="開始" class="buttonA">
 		        </form>
-		        <form method="post" action="/send/summarize/A" style="display: inline">
+		        <form method="post" action="/send/summarize-active/A" style="display: inline">
 		            <input type="submit" value="まとめ" class="buttonA">
 		        </form>
-		        <form method="post" action="/send/end/A" style="display: inline">
+		        <form method="post" action="/send/end-active/A" style="display: inline">
 		            <input type="submit" value="終了" class="buttonA">
 		        </form>
 		    </td></tr>
 		    <tr><td>
-            <form method="post" action="/send/cancel/A" style="display: inline">
+            <form method="post" action="/send/cancel-action/A" style="display: inline">
                 <input type="submit" value="取消" class="buttonD">
             </form>
 		        <form method="post" action="/send/recommendation-active/A" style="display: inline">
@@ -236,10 +248,10 @@
 		    </td></tr>
 		    <tr><td>
             <!-- <input type="submit" id='tipsB' value="Tips" class="buttonE"> -->
-            <form method="post" action="/send/tips-story-correction/B" style="display: inline">
+            <form method="post" action="/send/tips-story-correction/A" style="display: inline">
                 <input type="submit" value="あらすじ" class="buttonE">
             </form>
-            <form method="post" action="/send/tips-info-correction/B" style="display: inline">
+            <form method="post" action="/send/tips-info-correction/A" style="display: inline">
                 <input type="submit" value="ミニ情報" class="buttonE">
             </form>
 						<form method="post" action="/send/review-correction/A" style="display: inline">
@@ -257,7 +269,6 @@
 		    </td></tr>
 			</table>
 		</div>
-
 
 	  <div class="box3">
 			<table class="table2" border=2 align="left" height="330" width="640">

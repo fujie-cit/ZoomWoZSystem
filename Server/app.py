@@ -56,14 +56,14 @@ def index():
 def push_button(command, detail):
     woz_controller.execute(command, detail)
 
-    title_list, person_list = woz_controller.get_latest_information()
+    movie_list, person_list = woz_controller.get_latest_information()
 
-    title_list.extend(['None'] * topic_history_length)
-    title_list = title_list[:topic_history_length]
+    movie_list.extend([dict(title='None', movie_id=0)] * topic_history_length)
+    movie_list = movie_list[:topic_history_length]
     person_list.extend(['None'] * topic_history_length)
     person_list = person_list[:topic_history_length]
     message_dict = dict(
-        topics=title_list, person=person_list
+        movie_list=movie_list, person=person_list
     )
 
     return render_template('index.html', message=message_dict)

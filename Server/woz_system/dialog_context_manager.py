@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Tuple
 from pprint import pprint
 
 from .natural_language_generator_command import NaturalLanguageGeneratorCommand
@@ -105,13 +105,16 @@ class DialogContextManager:
                 result.append(nlg_command)
         return result
 
-    def get_latest_movie_title_list(self):
+    def get_latest_movie_list(self) -> List[dict]:
+        """最新の映画情報を取得する．
+
+        Returns:
+            List[dict]: 映画タイトルとIDの辞書のリスト
+        """
         # 逆向きにする
         movie_list = self._topic_cache_list[::-1]
-        # タイトルのリストに変える
-        r = [m['title'] for m in movie_list]
 
-        return r
+        return movie_list
 
     def get_latest_person_list(self):
         # 逆向きにする
@@ -131,7 +134,7 @@ class DialogContextManager:
         # コマンドごとの特殊処理
         if nlg_command.query.command == qc.Recommendation:
             # TODO genreを変えなくていいのだろうか...
-            self.append_title(
+            self.append_move_by_title(
                 nlg_command.dm_result['topic'],
                 nlg_command.dm_result['mid']
             )
@@ -143,7 +146,7 @@ class DialogContextManager:
             pass
             # raise NotImplementedError
 
-    def append_title(self, title: str, movie_id: int = None):
+    def append_move_by_title(self, title: str, movie_id: int = None):
         if movie_id is None:
             df = self._db_api.search_movie_by_title(title)
             if len(df) > 0:
@@ -159,6 +162,22 @@ class DialogContextManager:
         self._topic_cache_list.append(dict(
             title=title, movie_id=movie_id
         ))
+
+    def append_movie_by_id(self, movie_id: int):
+        current_movie_id = self.get_topic_movie_id()
+        if current_movie_id == movie_id:
+            return
+        
+        df = self._db_api.search_movie_by_id(movie_id)
+        if len(df) > 0:
+            title = df['title'].iloc[0]
+        else:
+            raise RuntimeError("cannot find movie info for movie_id {}".format(movie_id))
+        
+        self._topic_cache_list.append(dict(
+            title=title, movie_id=movie_id
+        ))
+
 
     def append_person(self, person_name: str):
         current_person_name = self.get_topic_person()

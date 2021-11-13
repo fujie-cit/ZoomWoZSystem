@@ -143,7 +143,7 @@ class WoZController:
             bell_data = get_bell_sound_data()
             self._sound_player.play(bell_data)
         elif command == qcn.ChangeTopic:
-            self._context_manager.append_title(target)
+            self._context_manager.append_movie_by_id(int(target))
         elif command == qcn.ChangePerson:
             self._context_manager.append_person(target)
         elif command == qcn.ChangeGenre:
@@ -253,7 +253,13 @@ class WoZController:
         else:
             self._execute_utterance_command(message, target)
 
-    def get_latest_information(self) -> Tuple[List[str], List[str]]:
-        title_list = self._context_manager.get_latest_movie_title_list()
+    def get_latest_information(self) -> Tuple[List[dict], List[str]]:
+        """最新の映画（トピック）と人物のリスト
+
+        Returns:
+            List[dict]: 映画のタイトルとIDの辞書のリスト
+            List[str]: 人物名のリスト
+        """
+        movie_list = self._context_manager.get_latest_movie_list()
         person_list = self._context_manager.get_latest_person_list()
-        return title_list, person_list
+        return movie_list, person_list

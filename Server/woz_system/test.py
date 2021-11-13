@@ -95,7 +95,7 @@ def test(config_file_path='config/config.ini'):
     def execute_meta_command(command, target):
         qc = Query.CommandName
         if command == qc.ChangeTopic:
-            context_manager.append_title(target)
+            context_manager.append_move_by_title(target)
         elif command == qc.ChangePerson:
             context_manager.append_person(target)
         elif command == qc.ChangeGenre:

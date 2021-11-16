@@ -127,6 +127,21 @@ class UserManagerClient:
         ))
         self._websocket_app.send(message)
 
+    
+    def request_stop_send_speech_recognition_result(self, user_name: str):
+        """音声認識結果送信停止要求を送る
+
+        Args:
+            user_name (str): 対象ユーザ名
+        """
+        nowstr = datetime.datetime.now().isoformat()
+        message = json.dumps(dict(
+            message_type='RequestStopSendSpeechRecognitionResult',
+            datetime=nowstr,
+            user_name=user_name
+        ))
+        self._websocket_app.send(message)
+
 
     def _on_message(self, ws, message):
         """メッセージを受信したときに呼び出されるコールバック関数．

@@ -6,15 +6,21 @@
 </head> -->
 <body>
 	<div class="box2">
-		<table class="table2" border=2 align="center" width="330">
-		<tr><td>
-			<form method="post" action="/send/start_dialog-meta/U" style="display: inline">
-				<input type="submit" value="対話開始" class="buttonM">
-			</form>
-			<form method="post" action="/send/finish_dialog-meta/U" style="display: inline">
-				<input type="submit" value="対話終了" class="buttonM">
-			</form>
-		</td></tr>
+		<table class="table2" border=0 align="center">
+		<tr>
+			<td style="font-size: 20px;">
+				対話ID: {{ dialog_id }}
+			</td>
+			<td width="50px"></td>
+			<td>
+				<form method="post" action="/send/start_dialog-meta/U" style="display: inline">
+					<input type="submit" value="対話開始" class="buttonM">
+				</form>
+				<form method="post" action="/send/finish_dialog-meta/U" style="display: inline">
+					<input type="submit" value="対話終了" class="buttonM">
+				</form>
+		    </td>
+	    </tr>
 	</table>
 	</div>
 
@@ -96,7 +102,7 @@
 		<table class="table2" border=2 align="center" width="330">
 		<tr><td>
 				<center id ='genre_btn'>
-					<input type="submit" value="ジャンル詳細" class='buttonG' id="genre_detail">
+					<input type="submit" value="ジャンル詳細" class='buttonG' id="genre_detail" style="color: #ffffff;">
 				</center>
 		</td></tr>
 	</table>
@@ -166,8 +172,21 @@
 		<div class="box4">
 			<table class="table2" border=2 align="right"  width="640">
 				<tr><td>
-					<p align="center">参加者 A</p>
-					</td></tr>
+					<span style="font-size: 20px;">参加者 A</span>
+					&emsp;
+					<form method="post" action="/update_user_a" style="display: inline">
+					<!--
+						<select>
+							{% for user in user_list %}
+								<option value="{{user}}" {{'selected' if user_a == user else ''}}>{{user}}</option>
+							{% endfor %}
+						</select>
+					-->
+					<input type="text" name="user_name" value="{{ '' if user_a == '--' else user_a }}"></input>
+					<input type="submit" value="設定" class="buttonM">
+					</form>
+				</td></tr>
+				</form>
 				<tr><td>
 		        <form method="post" action="/send/look-action/A" style="display: inline">
 		            <input type="submit" value="Look" class="buttonD">
@@ -262,7 +281,19 @@
 	  <div class="box3">
 			<table class="table2" border=2 align="left" height="330" width="640">
 		    <tr><td>
-		        <p align="center">参加者B</p>
+				<span style="font-size: 20px;">参加者 B</span>
+				&emsp;
+				<form method="post" action="/update_user_b" style="display: inline">
+					<!-- 
+					<select>
+						{% for user in user_list %}
+							<option value="{{user}}" {{'selected' if user_b == user else ''}}>{{user}}</option>
+						{% endfor %}
+					</select>
+				    -->
+				<input type="text" name="user_name" value="{{ '' if user_b == '--' else user_b }}"></input>
+				<input type="submit" value="設定" class="buttonM">
+				</form>
 		    </td></tr>
 		    <tr><td>
 		        <form method="post" action="/send/look/B" style="display: inline">

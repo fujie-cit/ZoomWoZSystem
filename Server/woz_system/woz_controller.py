@@ -22,6 +22,8 @@ from .logging import Logger
 from .logging.util import get_datetime_now_string
 from .sound import get_bell_sound_data
 
+from .speech_recognition.user_manager_client import SpeechRecognitionResult, SpeechRecognitionState, UserManagerClient
+
 class WoZControllerError(Exception):
     pass
 
@@ -65,6 +67,12 @@ class WoZController:
         self._update_utterance_candidates_thread = None
         self._update_utterance_candidates_cond = threading.Condition()
 
+        # 音声認識関係
+        self._user_a = None
+        self._user_b = None
+        self._user_manager_client = UserManagerClient(self._config["UserManager"]["url"])
+        self._user_manager_client.append_receiver(self._handle_speech_recognition_result)
+
     # インターフェース上のコマンドリスト
     _interface_command_list = [
         # # システム動作系(command_type: action)
@@ -91,6 +99,8 @@ class WoZController:
     ]
 
     def update_utterance_candidates(self):
+        """発話候補リストの更新を行う"""
+
         # 前回の実行の終了を待機する
         with self._update_utterance_candidates_cond:
             if self._update_utterance_candidates_thread is not None:
@@ -102,7 +112,7 @@ class WoZController:
             self._update_utterance_candidates_thread.start()
 
     def __update_utterance_candidates(self):
-        """ボタンを押された際の発話候補を更新する"""
+        """発話候補リストの更新を行う（実際に行う）"""
         self._utterance_candidates.clear()
         self._utterance_candidates_errors.clear()
         for target in WoZController._interface_target_list:
@@ -263,3 +273,36 @@ class WoZController:
         movie_list = self._context_manager.get_latest_movie_list()
         person_list = self._context_manager.get_latest_person_list()
         return movie_list, person_list
+
+    # 音声認識関係
+    def get_user_a(self) -> str:
+        """参加者Aのユーザ名を取得する．設定して無ければNone"""
+        return self._user_a
+
+    def get_user_b(self) -> str:
+        """参加者Bのユーザ名を取得する．設定して無ければNone"""
+        return self._user_b
+
+    def set_user_a(self, user_name: str):
+        """参加者Aのユーザ名を設定する. 当該ユーザの音声認識結果の監視を開始する"""
+        if user_name is self._user_a:
+            return
+        if self._user_a is not None and self._user_a != self._user_b:
+            self._user_manager_client.request_stop_send_speech_recognition_result(self._user_a)
+        self._user_a = user_name
+        self._user_manager_client.request_start_send_speech_recognition_result(self._user_a)
+        return
+
+    def set_user_b(self, user_name: str):
+        """参加者Bのユーザ名を設定する．当該ユーザの音声認識結果の監視を開始する"""
+        if user_name is self._user_b:
+            return
+        if self._user_b is not None and self._user_b != self._user_a:
+            self._user_manager_client.request_stop_send_speech_recognition_result(self._user_b)
+        self._user_b = user_name
+        self._user_manager_client.request_start_send_speech_recognition_result(self._user_b)
+        return
+
+
+    def _handle_speech_recognition_result(self, result: SpeechRecognitionResult):
+        pass

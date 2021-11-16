@@ -37,6 +37,9 @@ def get_index_html_context() -> dict:
     person_list.extend(['None'] * topic_history_length)
     person_list = person_list[:topic_history_length]
 
+    # 対話ID関係
+    dialog_id = woz_controller.get_dialog_id()
+
     # 音声認識関係
     user_list = [] # tentative
     user_a = woz_controller.get_user_a()
@@ -47,6 +50,7 @@ def get_index_html_context() -> dict:
     return dict(
         movie_list=movie_list, 
         person=person_list,
+        dialog_id=dialog_id,
         user_list=user_list,
         user_a=user_a,
         user_b=user_b

@@ -12,4 +12,5 @@ uc.append_receiver(callback)
 uc.request_start_send_speech_recognition_result("fujie")
 
 while True:
-    time.sleep(10)
+    uc.ping("fujie")
+    time.sleep(0.3)

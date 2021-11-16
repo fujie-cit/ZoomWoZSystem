@@ -32,6 +32,18 @@
     /* WebSocketがメッセージを受け取ったときのコールバック */
     ws.onmessage = function (evt) {
         showMessage(evt.data)
+        data = JSON.parse(evt.data)
+        if(data.message_type == 'Ping') {
+            datetime_now = new Date();
+            data = {
+                message_type: 'Pong',
+                datetime: datetime_now.toISOString(),
+                user_name: user_name,
+                source_datetime: data.source_datetime,
+                source_id: data.source_id
+            }
+            ws.send(JSON.stringify(data))
+        }
     }
 
     /* WebSocketが閉じたときのコールバック */

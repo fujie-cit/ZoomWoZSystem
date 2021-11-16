@@ -1,9 +1,11 @@
 # coding: utf-8
 from __future__ import print_function
+from http import client
 import os
 from geventwebsocket import WebSocketServer, WebSocketApplication, Resource
 from werkzeug.debug import DebuggedApplication
 from flask import Flask, render_template
+import datetime
 
 import json
 
@@ -32,12 +34,15 @@ class SpeechRecognitionApplication(WebSocketApplication):
         server = self.ws.handler.server
         # 初回でまだプロパティが無い場合は新規のディクショナリを追加する
         if getattr(server, 'username2servers', None) is None:
-            server.username2servers = dict()
+            server.username2servers = dict() # ユーザ名 -> 送信先のソケットのリスト
+            server.username2client = dict() # ユーザ名 -> クライアント
         # 以降の処理を簡単化するため，メンバ変数で参照する
         self.__username2servers = server.username2servers
+        self.__username2client = server.username2client
 
     def on_open(self):
-        print("Some client connected!")
+        # print("Some client connected!")
+        pass
 
     def on_message(self, message):
         if message is None:
@@ -49,10 +54,7 @@ class SpeechRecognitionApplication(WebSocketApplication):
         message_type = message['message_type']
         # from user
         if message_type == 'RequestLogin':
-            # ログインのリクエスト．現時点では管理する必要無し．
-            # 厳密さを考えなければ，送られてくる音声認識結果にすべてuser_nameが入っている
-            # のでそれを見れば送り先の判定ができる．
-            print("{} logged in".format(message['user_name']))
+            self.login(message)
         elif message_type == 'SendSpeechRecognitionResult':
             # 音声認識結果．適宜Wizardへ送信
             self.send_speech_recognition_result(message)
@@ -66,6 +68,26 @@ class SpeechRecognitionApplication(WebSocketApplication):
         elif message_type == 'RequestStopSendSpeechRecognitionResult':
             # 音声認識結果送信停止要求
             self.stop_send_speech_recognition_result(message)
+        elif message_type == 'Ping':
+            self.ping(message)
+        elif message_type == 'Pong':
+            self.pong(message)
+
+    def login(self, message):
+        """ログイン処理. とりあえずパスワード処理は無し
+
+        Args:
+            message (str): ユーザ名
+        """
+        user_name = message["user_name"]
+        current_client = self.ws.handler.active_client
+        old_user_name = getattr(current_client, 'user_name', None)
+        if old_user_name is not None:
+            if old_user_name in self.__username2client:
+                del self.__username2client[old_user_name]
+        current_client.user_name = user_name
+        self.__username2client[user_name] = current_client
+        print("{} logged in @{}".format(user_name, current_client.address))        
 
     def send_user_name_list(self):
         pass
@@ -128,6 +150,46 @@ class SpeechRecognitionApplication(WebSocketApplication):
         # リストから現在のソケットを削除する
         server_list.remove(self.ws)
         # print(server_list)
+
+    def ping(self, message: dict):
+        """Ping処理
+
+        Args:
+            message (dict): [description]
+        """
+        user_name = message['user_name']
+        client_to_send = self.__username2client[user_name]
+
+        dtime = datetime.datetime.now().isoformat()
+        source_dtime = message['datetime']
+        current_client = self.ws.handler.active_client
+        source_id = current_client.address
+        message_to_send = json.dumps(dict(
+            message_type="Ping",
+            datetime=dtime,
+            user_name=user_name,
+            source_datetime=source_dtime,
+            source_id=source_id
+        ))
+        client_to_send.ws.send(message_to_send)
+
+
+    def pong(self, message: dict):
+        """Pingへの応答"""
+        user_name=message['user_name']
+        source_id=message['source_id']
+        source_id=tuple(source_id)
+        client_to_send = self.ws.handler.server.clients[source_id]
+        
+        dtime = message['datetime']
+        source_dtime = message['source_datetime']
+        message_to_send = json.dumps(dict(
+            message_type="Pong",
+            datetime=dtime,
+            user_name=user_name,
+            source_datetime=source_dtime,
+        ))
+        client_to_send.ws.send(message_to_send)
 
     """
     def send_client_list(self, message):

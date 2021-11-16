@@ -95,6 +95,8 @@ class UserManagerClient:
         self._closed_with_error = False # エラー状態かどうか
 
         self._receiver_list = [] # type: List[SpeechRecognitionResult]
+        
+        self._diff_time_dict = {} # ユーザ名 -> 誤差時間
 
         # アプリをバックグラウンドで動かすためのスレッド
         self._thread = threading.Thread(target=self._websocket_app.run_forever)
@@ -142,6 +144,14 @@ class UserManagerClient:
         ))
         self._websocket_app.send(message)
 
+    def ping(self, user_name: str):
+        nowstr = datetime.datetime.now().isoformat()
+        message = json.dumps(dict(
+            message_type='Ping',
+            datetime=nowstr,
+            user_name=user_name
+        ))
+        self._websocket_app.send(message)
 
     def _on_message(self, ws, message):
         """メッセージを受信したときに呼び出されるコールバック関数．
@@ -162,7 +172,40 @@ class UserManagerClient:
                 message['speech_recognition_result'])
             for receiver in self._receiver_list:
                 receiver(result)
-                    
+        elif message['message_type'] == 'Pong':
+            self.handle_pong(message)
+
+    def handle_pong(self, message: dict):
+        """Pongを処理して，時差情報を更新
+
+        Args:
+            message (dict): 送信されたメッセージ
+        """
+        source_datetime = datetime.datetime.fromisoformat(message['source_datetime'])
+        user_datetime = message['datetime']
+        if user_datetime[-1] == 'Z':
+            user_datetime = user_datetime[:-1]
+            user_datetime = datetime.datetime.fromisoformat(user_datetime)
+            user_datetime = user_datetime + datetime.timedelta(hours=9)
+        else:
+            user_datetime = datetime.datetime.fromisoformat(user_datetime)
+
+        now = datetime.datetime.now()
+        
+        estimated_localtime = now + (now - source_datetime) / 2
+        diff_time = estimated_localtime - user_datetime
+
+        user_name = message['user_name']
+        
+        if user_name not in self._diff_time_dict:
+            self._diff_time_dict[user_name] = (diff_time, 1)
+        else:
+            avg, cnt = self._diff_time_dict[user_name]
+            new_diff_time = (avg * cnt + diff_time) / (cnt + 1)
+            self._diff_time_dict[user_name] = (new_diff_time, cnt + 1)
+
+        pprint(self._diff_time_dict, compact=False)
+
 
     def _on_open(self, ws):
         """サーバに接続したときに呼び出されるコールバック関数．

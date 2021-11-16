@@ -304,6 +304,10 @@ class WoZController:
         person_list = self._context_manager.get_latest_person_list()
         return movie_list, person_list
 
+    # 対話ID関係
+    def get_dialog_id(self):
+        return self._dialog_id
+
     # 音声認識関係
     def get_user_a(self) -> str:
         """参加者Aのユーザ名を取得する．設定して無ければNone"""

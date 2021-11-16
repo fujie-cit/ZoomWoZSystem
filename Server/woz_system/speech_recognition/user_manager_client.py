@@ -153,8 +153,8 @@ class UserManagerClient:
         message = json.loads(message)
         if message['message_type'] == 'SendSpeechRecognitionResult':
             nowstr = datetime.datetime.now().isoformat()
-            print("Speech Recognition Result " + nowstr)
-            pprint(message, compact=False)
+            # print("Speech Recognition Result " + nowstr)
+            # pprint(message, compact=False)
 
             result = SpeechRecognitionResult(
                 message['datetime'], message['user_name'], 

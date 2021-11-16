@@ -31,12 +31,16 @@ class Logger:
         self._queue = queue.Queue()
         self._thread = threading.Thread(target=self._run)
         self._thread_alive = True
+        self._cond = threading.Condition()
 
         if field_names:
             self._write_record([field_names], append=False)
         else:
             with open(self._filepath, 'w') as f:
                 pass
+
+        # 書き込んだレコード数
+        self._count = 0
 
         # atexit.register(self.close)
         self._thread.start()
@@ -45,7 +49,13 @@ class Logger:
         if not self._thread_alive:
             raise RuntimeError("already closed.")
         print("put: {}".format(data))
-        self._queue.put(data)
+        with self._cond:
+            self._count += 1
+            self._queue.put(data)
+
+    def get_new_id(self):
+        with self._cond:
+            return self._count + 1
 
     def close(self):
         self._thread_alive = False

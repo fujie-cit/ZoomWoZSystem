@@ -28,13 +28,34 @@ class WoZControllerError(Exception):
     pass
 
 
-def get_log_file_path(config: ConfigParser) -> str:
-    import datetime, os
+def generate_dialog_id() -> str:
+    """対話IDを生成する（ログファイルのディレクトリ名に相当する）．
+    日時をYYYYmmddHHMM形式で返す．
+
+    Returns:
+        str: 対話ID
+    """
+    import datetime
     now = datetime.datetime.now()
-    name = now.strftime("%Y%m%d%H%M")
-    dir = os.path.join(config['Log']['dir'], name)
+    dialog_id = now.strftime("%Y%m%d%H%M")
+    return dialog_id
+    
+
+def get_log_file_path(topdir: str, dialog_id: str, filename: str) -> str:
+    """ログファイルのパスを取得する.
+
+    Args:
+        topdir (str): ログのトップディレクトリ（設定ファイルから取得できる）
+        dialog_id (str): 対話ID（対話セッションによって異なる）
+        filename (str): ファイル名（用途によって異なる）
+
+    Returns:
+        str: ログファイルのパス
+    """
+    import os
+    dir = os.path.join(topdir, dialog_id)
     os.makedirs(dir, exist_ok=True)
-    return os.path.join(dir, 'system.csv')
+    return os.path.join(dir, filename)
     
 
 class WoZController:
@@ -62,14 +83,23 @@ class WoZController:
         self._utterance_candidates = dict()
         self._utterance_candidates_errors = dict()
 
-        self._logger = Logger(get_log_file_path(self._config))
 
         self._update_utterance_candidates_thread = None
         self._update_utterance_candidates_cond = threading.Condition()
 
+        # 対話ID
+        self._dialog_id = generate_dialog_id()
+
+        # 各種ロガー
+        log_top_dir = self._config['Log']['dir']
+        self._logger = Logger(get_log_file_path(log_top_dir, self._dialog_id, "system.csv"))
+        self._asr_logger = Logger(get_log_file_path(log_top_dir, self._dialog_id, "asr.csv"))
+
         # 音声認識関係
         self._user_a = None
+        self._user_a_result_cache = None # 音声認識開始に対応する結果のキャッシュ
         self._user_b = None
+        self._user_b_result_cache = None # 音声認識開始に対応する結果のキャッシュ
         self._user_manager_client = UserManagerClient(self._config["UserManager"]["url"])
         self._user_manager_client.append_receiver(self._handle_speech_recognition_result)
 
@@ -305,4 +335,39 @@ class WoZController:
 
 
     def _handle_speech_recognition_result(self, result: SpeechRecognitionResult):
-        pass
+        user_name = result.user_name
+        if user_name not in [self._user_a, self._user_b]:
+            return
+        
+        if result.state == SpeechRecognitionState.Start:
+            if user_name == self._user_a:
+                self._user_a_result_cache = result
+            else:
+                self._user_b_result_cache = result
+            return
+        
+        if result.state == SpeechRecognitionState.End:
+            content = result.result
+            if len(content) == "":
+                return
+            if user_name == self._user_a:
+                cache = self._user_a_result_cache
+                user_label = "A"
+            else:
+                cache = self._user_b_result_cache
+                user_label = "B"
+            if cache is not None:
+                start_dtime = cache.dtime
+            else:
+                start_dtime = None
+            
+            str_id = self._asr_logger.get_new_id()
+            str_start = start_dtime.isoformat() if start_dtime is not None else ""
+            str_end = result.dtime.isoformat()
+            
+            self._asr_logger.put([
+                str_id, user_label, str_start, str_end, content
+            ])
+
+
+

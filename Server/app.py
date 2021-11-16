@@ -1,6 +1,7 @@
 # coding:utf-8
 __editor__ = "Jin Sakuma"
 from flask import Flask, render_template, request
+from werkzeug.utils import get_content_type
 # from robot_controller import RobotController
 from woz_system.woz_controller import WoZController 
 import sys
@@ -26,47 +27,63 @@ app = Flask(__name__)
 topic_history_length = 6
 woz_controller = WoZController()
 
-@app.route('/')
-def index():
-    return render_template('index.html')
+def get_index_html_context() -> dict:
+    """index.htmlをレンダリングするために必要なコンテキストを取得する"""
 
-# @app.route('/stt', methods=['POST'])
-# def stt():
-#     date = request.form['date']
-#     time = request.form['time']
-#     text = request.form['text']
-#     user = request.form['user']
-#     topics, persons = rc.main(date, time, user, text)
-
-#     while len(topics) < topic_history_length:
-#         topics.append('NONE')
-#         persons.append('NONE')
-#     while len(topics) > topic_history_length:
-#         topics.pop(0)
-#         persons.pop(0)
-
-#     message_dic = {}
-#     message_dic['topics'] = topics
-#     message_dic['person'] = persons
-
-#     return render_template('index.html', message=message_dic)
-
-
-@app.route('/send/<command>/<detail>', methods=['POST'])
-def push_button(command, detail):
-    woz_controller.execute(command, detail)
-
+    # 対話履歴関係
     movie_list, person_list = woz_controller.get_latest_information()
-
     movie_list.extend([dict(title='None', movie_id=0)] * topic_history_length)
     movie_list = movie_list[:topic_history_length]
     person_list.extend(['None'] * topic_history_length)
     person_list = person_list[:topic_history_length]
-    message_dict = dict(
-        movie_list=movie_list, person=person_list
+
+    # 音声認識関係
+    user_list = [] # tentative
+    user_a = woz_controller.get_user_a()
+    user_a = "--" if user_a is None else user_a
+    user_b = woz_controller.get_user_b()
+    user_b = "--" if user_b is None else user_b
+
+    return dict(
+        movie_list=movie_list, 
+        person=person_list,
+        user_list=user_list,
+        user_a=user_a,
+        user_b=user_b
     )
 
-    return render_template('index.html', message=message_dict)
+@app.route('/')
+def index():
+    context = get_index_html_context()
+    return render_template('index.html', **context)
+
+@app.route('/test')
+def test():
+    user_list = ['--', 'fujie', 'sakuma', 'koba', 'suzuki']
+    return render_template('index.html', dialog_id="2021111601", user_list=user_list, user_a="--")
+
+@app.route('/update_user_a', methods=['POST'])
+def update_user_a():
+    if "user_name" in request.form:
+        user_name = request.form["user_name"]
+        woz_controller.set_user_a(user_name)
+    
+    context = get_index_html_context()
+    return render_template('index.html', **context)
+
+@app.route('/update_user_b', methods=['POST'])
+def update_user_b():
+    if "user_name" in request.form:
+        user_name = request.form["user_name"]
+        woz_controller.set_user_b(user_name)
+    context = get_index_html_context()
+    return render_template('index.html', **context)
+
+@app.route('/send/<command>/<detail>', methods=['POST'])
+def push_button(command, detail):
+    woz_controller.execute(command, detail)
+    context = get_index_html_context()
+    return render_template('index.html', **context)
 
 if __name__ == '__main__':
     app.run(debug=False, host=host, port=port, threaded=True)

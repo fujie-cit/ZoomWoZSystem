@@ -86,14 +86,14 @@ border-radius: 1.5px;
 }
 
 .buttonM {
-  width:100px;
-  height:50px;
-  font-size: 2.0em;
+  width:80px;
+  height:30px;
+  font-size: 1.4em;
   font-weight: bold;
   background-color: #aaaaaa;
   color: #fff;
-  border-bottom: solid 6px #bbbbbb;
-  border-right: solid 6px #999999;/*ボタン色より暗めに*/
+  border-bottom: solid 2px #bbbbbb;
+  border-right: solid 2px #999999;/*ボタン色より暗めに*/
   border-radius: 1.5px;
 }
 

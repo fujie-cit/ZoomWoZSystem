@@ -2,6 +2,7 @@ import traceback
 from configparser import ConfigParser
 import threading
 from typing import Tuple, List
+import datetime
 
 from .db_api import DB_API
 from .dialog_context_manager import DialogContextManager
@@ -94,6 +95,7 @@ class WoZController:
         log_top_dir = self._config['Log']['dir']
         self._logger = Logger(get_log_file_path(log_top_dir, self._dialog_id, "system.csv"))
         self._asr_logger = Logger(get_log_file_path(log_top_dir, self._dialog_id, "asr.csv"))
+        self._asr_logger_cond = threading.Condition()
 
         # 音声認識関係
         self._user_a = None
@@ -267,6 +269,25 @@ class WoZController:
                 ut.nlg_command.query.command_type,
                 ut.nlg_command.query.target,
                 ut.text])
+            # 音声認識結果ログにも書き出し
+            with self._asr_logger_cond:
+                time_start = datetime.datetime.now()
+                # 終了時間（予測） 
+                # TODO 音声波形の時間計算はここでやりたくない
+                num_samples = len(ut.speech_data) / 2
+                duration_in_second = num_samples / 32000
+                time_end = time_start + datetime.timedelta(seconds=duration_in_second)
+                
+                str_id = self._asr_logger.get_new_id()
+                user_label = "S"
+                str_start = time_start.isoformat()
+                str_end = time_end.isoformat()
+                content = ut.text
+
+                self._asr_logger.put([
+                    str_id, user_label, str_start, str_end, content
+                ])
+
             # 次回の発話を生成する
             self.update_utterance_candidates()
         else:
@@ -344,7 +365,6 @@ class WoZController:
         self._user_manager_client.request_start_send_speech_recognition_result(self._user_b)
         return
 
-
     def _handle_speech_recognition_result(self, result: SpeechRecognitionResult):
         user_name = result.user_name
         if user_name not in [self._user_a, self._user_b]:
@@ -372,13 +392,16 @@ class WoZController:
             else:
                 start_dtime = None
             
-            str_id = self._asr_logger.get_new_id()
-            str_start = start_dtime.isoformat() if start_dtime is not None else ""
-            str_end = result.dtime.isoformat()
+            with self._asr_logger_cond:
+                str_id = self._asr_logger.get_new_id()
+                str_start = start_dtime.isoformat() if start_dtime is not None else ""
+                str_end = result.dtime.isoformat()
             
-            self._asr_logger.put([
-                str_id, user_label, str_start, str_end, content
-            ])
+                self._asr_logger.put([
+                    str_id, user_label, str_start, str_end, content
+                ])
+            
+            # TODO この後，言語処理 -> 発話候補更新の流れ
 
 
 

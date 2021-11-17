@@ -37,7 +37,7 @@ class AgentPlayerWrapper:
         self._put_task(task)
 
     def nod(self):
-        task = self._agent_player.nod()
+        task = self._agent_player.nod
         self._put_task(task)
 
     def _put_task(self, task):

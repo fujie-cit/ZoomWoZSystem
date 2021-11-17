@@ -297,24 +297,24 @@
 				</form>
 		    </td></tr>
 		    <tr><td>
-		        <form method="post" action="/send/look/B" style="display: inline">
+		        <form method="post" action="/send/look-action/B" style="display: inline">
 		            <input type="submit" value="Look" class="buttonD">
 		        </form>
-		        <form method="post" action="/send/nod/B" style="display: inline">
+		        <form method="post" action="/send/nod-action/B" style="display: inline">
 		            <input type="submit" value="Nod" class="buttonD">
 		        </form>
-		        <form method="post" action="/send/start/B" style="display: inline">
+		        <form method="post" action="/send/start-active/B" style="display: inline">
 		            <input type="submit" value="開始" class="buttonA">
 		        </form>
-		        <form method="post" action="/send/summarize/B" style="display: inline">
+		        <form method="post" action="/send/summarize-active/B" style="display: inline">
 		            <input type="submit" value="まとめ" class="buttonA">
 		        </form>
-		        <form method="post" action="/send/end/B" style="display: inline">
+		        <form method="post" action="/send/end-active/B" style="display: inline">
 		            <input type="submit" value="終了" class="buttonA">
 		        </form>
 		    </td></tr>
 		    <tr><td>
-            <form method="post" action="/send/cancel/B" style="display: inline">
+            <form method="post" action="/send/cancel-action/B" style="display: inline">
                 <input type="submit" value="取消" class="buttonD">
             </form>
 		        <form method="post" action="/send/recommendation-active/B" style="display: inline">
@@ -323,7 +323,7 @@
 		        <form method="post" action="/send/detail-active/B" style="display: inline">
 		            <input type="submit" value="能動" class="buttonC">
 		        </form>
-		        <form method="post" action="/send/question/B" style="display: inline">
+		        <form method="post" action="/send/question-active/B" style="display: inline">
 		            <input type="submit" value="質問" class="buttonC">
 		        </form>
 		    </td></tr>
@@ -386,7 +386,17 @@
 		    </td></tr>
 		</table>
 	</div>
-
+	{% if debug_message %}
+	<div class="box2">
+		<table class="table2" border=0 align="center" width="330">
+			<tr height=20px><td></td></tr>
+		<tr><td align="left">
+			<strong>DEBUG MESSAGE</strong><br>
+				{{ debug_message | safe }}
+		</td></tr>
+		</table>
+	</div>
+	{% endif %}
 </div>
 <div>
 	<!-- <div class="box5" height='200px'>

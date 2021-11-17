@@ -9,16 +9,12 @@ from configparser import ConfigParser
 from os import path
 
 
-CHUNK = 1024
-WIDTH = 2
-CHANNEL = 1
-RATE = 24000
-
 def audio_content2pcm(audio_content):
     f = io.BytesIO(audio_content)
     w = wave.open(f)
     b = w.readframes(w.getnframes())
     return b
+
 
 class TextToSpeech:
     """音声合成"""

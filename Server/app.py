@@ -7,7 +7,7 @@ from woz_system.woz_controller import WoZController
 import sys
 # import logging
 # import logging.handlers
-
+import traceback
 
 app = Flask(__name__)
 # FlaskのLoggerを無効化する
@@ -88,8 +88,15 @@ def update_user_b():
 
 @app.route('/send/<command>/<detail>', methods=['POST'])
 def push_button(command, detail):
-    woz_controller.execute(command, detail)
+    debug_message = None
+    try: 
+        woz_controller.execute(command, detail)
+    except Exception as e:
+        debug_message = traceback.format_exc()
+        # debug_message = debug_message.replace('\n', '<br>')
+
     context = get_index_html_context()
+    context['debug_message'] = '<pre>' + debug_message  + '</pre>'
     return render_template('index.html', **context)
 
 if __name__ == '__main__':

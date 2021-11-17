@@ -44,7 +44,6 @@ def get_index_html_context() -> dict:
     # 音声認識関係
     user_list = woz_controller.get_user_list()
     user_list.insert(0, "--")
-    print(user_list)
     user_a = woz_controller.get_user_a()
     user_a = "--" if user_a is None else user_a
     user_b = woz_controller.get_user_b()

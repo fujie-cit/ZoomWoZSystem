@@ -223,7 +223,9 @@ class SpeechRecognitionApplication(WebSocketApplication):
         user_name=message['user_name']
         source_id=message['source_id']
         source_id=tuple(source_id)
-        client_to_send = self.ws.handler.server.clients[source_id]
+        client_to_send = self.ws.handler.server.clients.get(source_id)
+        if client_to_send is None:
+            return
         
         dtime = message['datetime']
         source_dtime = message['source_datetime']

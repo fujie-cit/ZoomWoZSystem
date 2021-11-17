@@ -16,6 +16,11 @@
 			<td style="font-size: 20px;">
 				対話ID: {{ dialog_id }}
 			</td>
+			<td>
+				<form method="get" action="/update_session" style="display: inline">
+					<input type="submit" value="更新" class="buttonM">
+				</form>
+		    </td>
 			<td width="50px"></td>
 			<td>
 				<form method="post" action="/send/start_dialog-meta/U" style="display: inline">

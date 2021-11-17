@@ -45,8 +45,9 @@ class Query:
         Passive="passive"
         Correction="correction"
 
-    def __init__(self, command=None, command_type=None, target=None, slot=dict()):
+    def __init__(self, command=None, command_arg=None, command_type=None, target=None, slot=dict()):
         self._command = command
+        self._command_arg = command_arg
         self._command_type = command_type
         self._target = target
         self._slot = slot
@@ -59,6 +60,15 @@ class Query:
     @command.setter
     def command(self, value):
         self._command = value
+
+    @property
+    def command_arg(self):
+        """コマンド引数（tipsのみ持つ．ログ用）"""
+        return self._command_arg
+
+    @command_arg.setter
+    def command_arg(self, value):
+        self._command_arg = value
 
     @property
     def command_type(self):

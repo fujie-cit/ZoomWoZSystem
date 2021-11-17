@@ -93,7 +93,8 @@ class WoZController:
 
         # 各種ロガー
         log_top_dir = self._config['Log']['dir']
-        self._logger = Logger(get_log_file_path(log_top_dir, self._dialog_id, "system.csv"))
+        self._control_logger = Logger(get_log_file_path(log_top_dir, self._dialog_id, "control.csv"))
+        self._control_logger_cond = threading.Condition()
         self._asr_logger = Logger(get_log_file_path(log_top_dir, self._dialog_id, "asr.csv"))
         self._asr_logger_cond = threading.Condition()
 
@@ -182,24 +183,28 @@ class WoZController:
 
         # ログ保存用の日時文字列
         dt = get_datetime_now_string()
-
-        if command == qcn.StartDialog or command == qcn.FinishDialog:
-            # ベルを鳴らす
-            bell_data = get_bell_sound_data()
-            self._sound_player.play(bell_data)
-        elif command == qcn.ChangeTopic:
-            self._context_manager.append_movie_by_id(int(target))
-        elif command == qcn.ChangePerson:
-            self._context_manager.append_person(target)
-        elif command == qcn.ChangeGenre:
-            self._context_manager.append_genre_id(int(target))
-        else:
-            raise WoZControllerError(
-                "unknown command {} of command type {}".format(
+        success = False
+        try:
+            if command == qcn.StartDialog or command == qcn.FinishDialog:
+                # ベルを鳴らす
+                bell_data = get_bell_sound_data()
+                self._sound_player.play(bell_data)
+            elif command == qcn.ChangeTopic:
+                self._context_manager.append_movie_by_id(int(target))
+            elif command == qcn.ChangePerson:
+                self._context_manager.append_person(target)
+            elif command == qcn.ChangeGenre:
+                self._context_manager.append_genre_id(int(target))
+            else:
+                raise WoZControllerError(
+                    "unknown command {} of command type {}".format(
                     command, command_type))
-
-        # 実行成功時にログ保存
-        self._logger.put([dt, command, command_type, target, None])
+            success = True
+        finally:
+            # ログ保存
+            with self._control_logger_cond:
+                control_id = self._control_logger.get_new_id()
+                self._control_logger.put([control_id, dt, command, None, command_type, target, None, success])
 
 
     def _execute_action_command(self, command, command_arg, command_type, target):
@@ -220,6 +225,7 @@ class WoZController:
         dt = get_datetime_now_string()
 
         # 実行
+        success = False
         try:
             if command == qcn.Look:
                 self._agent_player.look(target)
@@ -229,12 +235,14 @@ class WoZController:
                 raise WoZControllerError(
                     "unknown command {} of command type {}".format(
                         command, command_type))
-
-            # 実行成功時にログ保存
-            self._logger.put([dt, command, command_type, target, None])
-
+            success = True
         except AgentPlayerWrapperError:
             print(traceback.format_exc())
+        finally:
+            # ログ保存
+            with self._control_logger_cond:
+                control_id = self._control_logger.get_new_id()
+                self._control_logger.put([control_id, dt, command, None, command_type, target, None, success])
 
     def _execute_utterance_command(self, message, target):
         """システム発話の行動を実行する
@@ -247,7 +255,11 @@ class WoZController:
             WoZControllerError: 対応するシステム発話データを生成できなかった場合
         """
         dt = get_datetime_now_string()
-        
+
+        # パース（無駄だがログのため）
+        command, command_arg, command_type, target = \
+            parse_wizard_command(message, target)
+
         # 候補更新中だったら待機する
         if self._update_utterance_candidates_thread is not None:
             self._update_utterance_candidates_thread.join()
@@ -263,12 +275,18 @@ class WoZController:
         if ut is not None:
             self._sound_player.play(ut.speech_data)
             self._context_manager.append_executed_nlg_command(ut.nlg_command)
-            self._logger.put([
-                dt,
-                ut.nlg_command.query.command,
-                ut.nlg_command.query.command_type,
-                ut.nlg_command.query.target,
-                ut.text])
+
+            # 成功時のログ
+            with self._control_logger_cond:
+                control_id = self._control_logger.get_new_id()            
+                self._control_logger.put([
+                    control_id, 
+                    dt,
+                    ut.nlg_command.query.command,
+                    ut.nlg_command.query.command_arg,
+                    ut.nlg_command.query.command_type,
+                    ut.nlg_command.query.target,
+                    ut.text, True])
             # 音声認識結果ログにも書き出し
             with self._asr_logger_cond:
                 time_start = datetime.datetime.now()
@@ -278,19 +296,24 @@ class WoZController:
                 duration_in_second = num_samples / 32000
                 time_end = time_start + datetime.timedelta(seconds=duration_in_second)
                 
-                str_id = self._asr_logger.get_new_id()
+                asr_id = self._asr_logger.get_new_id()
                 user_label = "S"
                 str_start = time_start.isoformat()
                 str_end = time_end.isoformat()
                 content = ut.text
 
                 self._asr_logger.put([
-                    str_id, user_label, str_start, str_end, "0.0", content
+                    asr_id, user_label, str_start, str_end, "0.0", content
                 ])
 
             # 次回の発話を生成する
             self.update_utterance_candidates()
         else:
+            # 失敗時のログ
+            with self._control_logger_cond:
+                control_id = self._control_logger.get_new_id()
+                self._control_logger.put([control_id, dt, command, command_arg, command_type, target, None, False])
+
             raise WoZControllerError(
                 "could not generate utterance for {}/{}".format(message, target))
 

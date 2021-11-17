@@ -270,6 +270,7 @@ class QueryGenerator:
     def _generate_query_for_tips(self, command_arg, command_type):
         query = Query(
             command="tips",
+            command_arg=command_arg,
             command_type=command_type
         )
 

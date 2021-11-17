@@ -54,7 +54,7 @@ class LipSync:
         self.__client.send ('MOU', target)
 
 class SoundPlay:
-    CHUNK=512
+    CHUNK=3200
 
     def __init__(self, lip_sync=None):
         self._p = pa.PyAudio()
@@ -86,7 +86,7 @@ class SoundPlay:
             self._cond.notify_all()
 
     def callback (self, in_data, frame_count, time_info, status):
-        # print "%d" % frame_count
+        # print(frame_count) # frames_per_bufferで指定した値
         rv = b'\x00\x00' * frame_count
         with self._cond:
             if self._data == None:

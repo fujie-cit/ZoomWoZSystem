@@ -82,6 +82,25 @@ class SpeechRecognitionApplication(WebSocketApplication):
         user_name = message["user_name"]
         current_client = self.ws.handler.active_client
         old_user_name = getattr(current_client, 'user_name', None)
+
+        reason = None
+        if len(user_name) == 0:
+            reason = "ユーザ名を入力して下さい"
+        elif not user_name.encode('utf-8').isalnum():
+            reason = "ユーザ名は半角英数字のみにしてください"
+        elif user_name != old_user_name and user_name in self.__username2client.keys():
+            reason = "ユーザ名 {} は既に使われています".format(user_name)
+        if reason:
+            message_to_send = json.dumps(dict(
+                message_type="ResultLogin",
+                datetime=datetime.datetime.now().isoformat(),
+                result="Faiure",
+                reason=reason,
+            ))
+            current_client = self.ws.handler.active_client
+            current_client.ws.send(message_to_send)
+            return
+
         if old_user_name is not None:
             if old_user_name in self.__username2client:
                 del self.__username2client[old_user_name]
@@ -89,6 +108,14 @@ class SpeechRecognitionApplication(WebSocketApplication):
         self.__username2client[user_name] = current_client
         print("{} logged in @{}".format(user_name, current_client.address))
         self.send_user_name_list(broadcast=True)
+
+        message_to_send = json.dumps(dict(
+            message_type="ResultLogin",
+            datetime=datetime.datetime.now().isoformat(),
+            result="Success",
+        ))
+        current_client = self.ws.handler.active_client
+        current_client.ws.send(message_to_send)
 
     def send_user_name_list(self, broadcast=False):
         """ユーザ名リスト送信

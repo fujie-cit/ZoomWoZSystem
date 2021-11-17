@@ -1,7 +1,7 @@
 <!doctype html>
 <head>
     <meta charset="utf-8"/>
-    <title>WebSocket Chat Example</title>
+    <title>対話データ収集用 音声認識プログラム</title>
     <style>
         li {
             list-style: none;
@@ -13,15 +13,27 @@
     </script>
 </head>
 <body>
-<h2>WebSocket Speech Recognition Example</h2>
+<h2>対話データ収集用 音声認識 プログラム</h2>
+
+1. ユーザ名を入力して「ログイン」ボタンを押して下さい．
 <form>
-    <input type="text" value="fujie" id="login_user_name"/>
+    &emsp; <input type="text" value="" id="login_user_name"/>
+    <input type="text" name="dummy" style="display:none;">
     <input type="button" value="ログイン" id="login_button"/>
 </form>
-
 <br>
-<button type="button" id="start">音声入力開始</button>
-<div id="messages"></div>
+
+2. 下記に接続OKと出てくればOKです．<br>
+&emsp; <span id="message_connection">接続未確認</span>
+<br><br>
+
+3. 準備ができたら「音声入力開始」を押して下さい．<br>
+&emsp; <button type="button" id="start">音声入力開始</button>
+<br><br>
+
+4. 下記に音声認識結果が出てくればOKです．
+<div id="message_recognition"></div>
+
 </body>
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"
         integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="

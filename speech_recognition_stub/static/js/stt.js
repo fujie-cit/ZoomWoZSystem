@@ -1,11 +1,11 @@
 (function () {
     let user_name = 'unknown';
+    let logged_in = false;
     let at_least_one_word_recognized = false;
     let time_onspeechend = null;
 
     function showMessage(message) {
-        // $('#messages').append('<li>' + message)
-        $('#messages').html('<li>' + message)
+        $('#message_recognition').html(message);
     }
 
     /* WebSocketが使えるかどうかのチェック */
@@ -13,7 +13,8 @@
         if (window.MozWebSocket) {
             window.WebSocket = window.MozWebSocket;
         } else {
-            showMessage("Your browser doesn't support WebSockets")
+            // showMessage("Your browser doesn't support WebSockets")
+            alert("Your browser doesn't support WebSockets")
         }
     }
 
@@ -27,12 +28,12 @@
 
     /* WebSocketが開いたときのコールバック */
     ws.onopen = function (evt) {
-        showMessage('Connected.')
+        // showMessage('Connected.')
     }
 
     /* WebSocketがメッセージを受け取ったときのコールバック */
     ws.onmessage = function (evt) {
-        showMessage(evt.data)
+        // showMessage(evt.data)
         data = JSON.parse(evt.data)
         if(data.message_type == 'Ping') {
             datetime_now = new Date();
@@ -44,12 +45,22 @@
                 source_id: data.source_id
             }
             ws.send(JSON.stringify(data))
+        } else if (data.message_type == 'ResultLogin') {
+            if(data.result == 'Success') {
+                $('#message_connection').html('接続OK');
+                logged_in = true;
+            } else {
+                $('#message_connection').html('接続NG(' + data.reason + ')');
+                logged_in = false;
+            }
         }
     }
 
     /* WebSocketが閉じたときのコールバック */
     ws.onclose = function (evt) {
-        $('#messages').append('<li>WebSocket connection closed.</li>');
+        $('#message_connection').html('サーバーエラー');
+        $('#message_connection').css('color', 'red');
+        logged_in = false;
     }
 
     let error = false; // webkitSpeechRecognition が使えない
@@ -106,6 +117,14 @@
             }
             speech_recognition_result = e.results[e.resultIndex][0].transcript;
 
+            if (logged_in) {
+                result_to_show = speech_recognition_result;
+                if (speech_recognition_state == "End") {
+                    result_to_show = result_to_show + "（終了）"
+                }
+                showMessage(user_name + ": " + result_to_show);
+            }
+
             message = JSON.stringify({
                 message_type: "SendSpeechRecognitionResult",
                 datetime: datetime_to_send.toISOString(),
@@ -147,7 +166,7 @@
             if (recognizing) {
                 recognizing = false;
                 // writeResult(recognitionValue);
-                showMessage(recognitionValue);
+                // showMessage(recognitionValue);
                 recognitionValue = '';
             }
 
@@ -165,6 +184,9 @@
             // user_name: ユーザ名
             // speech_recognition_state: Start / Partial / End
             // speech_recognition_result: 音声認識結果（文字列，Startの場合も考慮して空文字もあり）
+            if (logged_in) {
+                showMessage(user_name + ": 認識中...");
+            }
             datetime_now = new Date();
             message = JSON.stringify({
                 message_type: 'SendSpeechRecognitionResult',
@@ -181,6 +203,9 @@
             // ws.send("音声認識終了")
             time_onspeechend = new Date();
             if (!at_least_one_word_recognized) {
+                if (logged_in) {
+                    showMessage(user_name + ": 待機中...");
+                }
                 message = JSON.stringify({
                     message_type: 'SendSpeechRecognitionResult',
                     datetime: time_onspeechend.toISOString(),

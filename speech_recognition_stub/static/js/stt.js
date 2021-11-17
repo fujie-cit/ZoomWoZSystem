@@ -1,6 +1,7 @@
 (function () {
     let user_name = 'unknown';
     let at_least_one_word_recognized = false;
+    let time_onspeechend = null;
 
     function showMessage(message) {
         // $('#messages').append('<li>' + message)
@@ -94,15 +95,20 @@
             // speech_recognition_result: 音声認識結果（文字列，Startの場合も考慮して空文字もあり）
             
             speech_recognition_state = "Partial";
+            datetime_now = new Date();
+            datetime_to_send = datetime_now;
             if(e.results[e.resultIndex].isFinal) {
                 speech_recognition_state = "End"
+                if (time_onspeechend != null) {
+                    datetime_to_send = time_onspeechend;
+                    time_onspeechend = null;
+                } 
             }
             speech_recognition_result = e.results[e.resultIndex][0].transcript;
 
-            datetime_now = new Date();
             message = JSON.stringify({
                 message_type: "SendSpeechRecognitionResult",
-                datetime: datetime_now.toISOString(),
+                datetime: datetime_to_send.toISOString(),
                 user_name: user_name,
                 speech_recognition_state: speech_recognition_state,
                 speech_recognition_result: speech_recognition_result
@@ -173,16 +179,17 @@
 
         recognition.onspeechend = function () {
             // ws.send("音声認識終了")
+            time_onspeechend = new Date();
             if (!at_least_one_word_recognized) {
-                datetime_now = new Date();
                 message = JSON.stringify({
                     message_type: 'SendSpeechRecognitionResult',
-                    datetime: datetime_now.toISOString(),
+                    datetime: time_onspeechend.toISOString(),
                     user_name: user_name,
                     speech_recognition_state: 'End',
                     speech_recognition_result: ''
                 })
                 ws.send(message)
+                time_onspeechend = null;
             }
         }
     }

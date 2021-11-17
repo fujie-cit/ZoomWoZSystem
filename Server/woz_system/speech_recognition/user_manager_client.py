@@ -5,6 +5,7 @@ from pprint import pprint
 import datetime
 from typing import Union, Callable, List
 from enum import Enum
+import time
 
 
 class SpeechRecognitionState(Enum):
@@ -30,7 +31,10 @@ class SpeechRecognitionResult:
         if isinstance(dtime, str):
             if dtime[-1] == 'Z':
                 dtime = dtime[:-1]
-            dtime = datetime.datetime.fromisoformat(dtime)
+                dtime = datetime.datetime.fromisoformat(dtime)
+                dtime = dtime + datetime.timedelta(hours=9)
+            else:
+                dtime = datetime.datetime.fromisoformat(dtime)
 
         if isinstance(state, str):
             if state == "Start":
@@ -104,6 +108,11 @@ class UserManagerClient:
         self._thread.daemon = True
         self._thread.start()
 
+        # 定期的に ping を打つスレッド
+        self._ping_thread = threading.Thread(target=self._periodic_ping)
+        self._ping_thread.daemon = True
+        self._ping_thread.start()
+
         # 接続が開始するか，エラーで止まるまで待機
         with self._cond:
             while not self._opened and not self._closed:
@@ -122,6 +131,21 @@ class UserManagerClient:
             return
         with self._cond:
             self._receiver_list.append(receiver)
+
+    def get_diff_time(self, user_name: str) -> datetime.timedelta:
+        """ユーザ端末との推定時差を返す．
+
+        Args:
+            user_name (str): ユーザ名
+
+        Returns:
+            datetime.timedelta: 時差．存在しないときは None
+        """
+        diff_time = None # type: datetime.timedelta
+        with self._cond:
+            diff_time = self._diff_time_dict.get(user_name)
+        return diff_time
+
 
     def request_send_user_name_list(self):
         """ユーザ名リスト送信要求を出す"""
@@ -185,13 +209,10 @@ class UserManagerClient:
         message = json.loads(message)
 
         # DEBUG
-        pprint(message)
+        # pprint(message)
 
         if message['message_type'] == 'SendSpeechRecognitionResult':
-            nowstr = datetime.datetime.now().isoformat()
-            # print("Speech Recognition Result " + nowstr)
-            # pprint(message, compact=False)
-
+            self.handle_send_speech_recognition_result(message)
         elif message['message_type'] == 'SendUserNameList':
             self.handle_send_user_name_list(message)
         elif message['message_type'] == 'Pong':
@@ -247,14 +268,15 @@ class UserManagerClient:
 
         user_name = message['user_name']
         
-        if user_name not in self._diff_time_dict:
-            self._diff_time_dict[user_name] = (diff_time, 1)
-        else:
-            avg, cnt = self._diff_time_dict[user_name]
-            new_diff_time = (avg * cnt + diff_time) / (cnt + 1)
-            self._diff_time_dict[user_name] = (new_diff_time, cnt + 1)
+        with self._cond:
+            if user_name not in self._diff_time_dict:
+                self._diff_time_dict[user_name] = (diff_time, 1)
+            else:
+                avg, cnt = self._diff_time_dict[user_name]
+                new_diff_time = (avg * cnt + diff_time) / (cnt + 1)
+                self._diff_time_dict[user_name] = (new_diff_time, cnt + 1)
 
-        pprint(self._diff_time_dict, compact=False)
+        # pprint(self._diff_time_dict, compact=False)
 
 
     def _on_open(self, ws):
@@ -299,3 +321,9 @@ class UserManagerClient:
         """
         self._websocket_app.send(message)
 
+    def _periodic_ping(self):
+        while True:
+            user_name_list = self.get_user_name_list()
+            for user_name in user_name_list:
+                self.ping(user_name)
+            time.sleep(1)

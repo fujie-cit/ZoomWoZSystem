@@ -359,7 +359,7 @@ class WoZController:
         
         if result.state == SpeechRecognitionState.End:
             content = result.result
-            if len(content) == "":
+            if len(content) == 0:
                 return
             if user_name == self._user_a:
                 cache = self._user_a_result_cache

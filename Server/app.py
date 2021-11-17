@@ -96,7 +96,8 @@ def push_button(command, detail):
         # debug_message = debug_message.replace('\n', '<br>')
 
     context = get_index_html_context()
-    context['debug_message'] = '<pre>' + debug_message  + '</pre>'
+    if debug_message:
+        context['debug_message'] = '<pre>' + debug_message  + '</pre>'
     return render_template('index.html', **context)
 
 if __name__ == '__main__':

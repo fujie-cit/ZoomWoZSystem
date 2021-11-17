@@ -4,6 +4,7 @@ import threading
 from typing import Tuple, List
 import datetime
 
+
 from .db_api import DB_API
 from .dialog_context_manager import DialogContextManager
 from .query_generator import QueryGenerator
@@ -19,7 +20,7 @@ from .agent_player_wrapper import \
 from .query import Query
 from .woz_command import parse_wizard_command
 
-from .logging import Logger
+from .logging import Logger, JSONLogger
 from .logging.util import get_datetime_now_string
 from .sound import get_bell_sound_data
 
@@ -97,6 +98,7 @@ class WoZController:
         self._control_logger_cond = threading.Condition()
         self._asr_logger = Logger(get_log_file_path(log_top_dir, self._dialog_id, "asr.csv"))
         self._asr_logger_cond = threading.Condition()
+        self._json_logger = JSONLogger(get_log_file_path(log_top_dir, self._dialog_id, "system.json"))
 
         # 音声認識関係
         self._user_a = None
@@ -276,7 +278,7 @@ class WoZController:
             self._sound_player.play(ut.speech_data)
             self._context_manager.append_executed_nlg_command(ut.nlg_command)
 
-            # 成功時のログ
+            # 成功時の操作ログへの書き出し
             with self._control_logger_cond:
                 control_id = self._control_logger.get_new_id()            
                 self._control_logger.put([
@@ -287,7 +289,7 @@ class WoZController:
                     ut.nlg_command.query.command_type,
                     ut.nlg_command.query.target,
                     ut.text, True])
-            # 音声認識結果ログにも書き出し
+            # 音声認識結果ログに書き出し
             with self._asr_logger_cond:
                 time_start = datetime.datetime.now()
                 # 終了時間（予測） 
@@ -305,11 +307,18 @@ class WoZController:
                 self._asr_logger.put([
                     asr_id, user_label, str_start, str_end, "0.0", content
                 ])
-
+            # システムログに書き出し
+            json_info = dict(
+                datetime=dt,
+                control_id=control_id,
+                asr_id=asr_id,
+                utterance_candidate=ut.get_json_log_info()
+            )
+            self._json_logger.put(json_info)
             # 次回の発話を生成する
             self.update_utterance_candidates()
         else:
-            # 失敗時のログ
+            # 失敗時の操作ログへの書き出し
             with self._control_logger_cond:
                 control_id = self._control_logger.get_new_id()
                 self._control_logger.put([control_id, dt, command, command_arg, command_type, target, None, False])

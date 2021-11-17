@@ -31,3 +31,10 @@ class NaturalLanguageGeneratorCommand:
 
     def __str__(self):
         return "Query:{}, DMResult:{}".format(self._query, self._dm_result)
+
+    def get_json_log_info(self) -> dict:
+        """JSONログに書き出すための情報を取得"""
+        return dict(
+            query=self.query.get_json_log_info(),
+            dm_result=self.dm_result
+        )

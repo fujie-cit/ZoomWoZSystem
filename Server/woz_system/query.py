@@ -105,3 +105,13 @@ class Query:
             repr(self._command_type), repr(self._target),
             repr(self._slot),
         )
+
+    def get_json_log_info(self) -> dict:
+        """JSONログに書き出すためのdictを取得"""
+        return dict(
+            command=self.command,
+            command_arg=self.command_arg,
+            command_type=self.command_type,
+            target=self.target,
+            slot=self.slot
+        )

@@ -30,6 +30,13 @@ class UtteranceCandidate:
     def speech_data(self):
         return self._speech_data
 
+    def get_json_log_info(self) -> dict:
+        """JSONログに書き出すための情報を取得"""
+        return dict(
+            nlg_command=self.nlg_command.get_json_log_info(),
+            text=self.text,
+        )
+
 
 class UtteranceCandidateGeneratorError(Exception):
     pass

@@ -30,6 +30,13 @@ class DialogContextManager:
         self._executed_nlg_command_list = []  # type: List[NaturalLanguageGeneratorCommand]
 
 
+    def clear(self):
+        """すべての履歴をクリアする"""
+        self._genre_cache_list.clear()
+        self._person_cache_list.clear()
+        self._topic_cache_list.clear()
+        self._executed_nlg_command_list.clear()
+
     def get_current_genre_id(self) -> int:
         """現在のジャンルIDを取得する"""
         if len(self._genre_cache_list) == 0:

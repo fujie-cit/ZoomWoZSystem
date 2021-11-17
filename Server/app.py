@@ -64,10 +64,12 @@ def index():
     context = get_index_html_context()
     return render_template('index.html', **context)
 
-@app.route('/test')
-def test():
-    user_list = ['--', 'fujie', 'sakuma', 'koba', 'suzuki']
-    return render_template('index.html', dialog_id="2021111601", user_list=user_list, user_a="--")
+@app.route('/update_session')
+def update_session():
+    woz_controller.start_new_session()
+
+    context = get_index_html_context()
+    return render_template('index.html', **context)
 
 @app.route('/update_user_a', methods=['POST'])
 def update_user_a():

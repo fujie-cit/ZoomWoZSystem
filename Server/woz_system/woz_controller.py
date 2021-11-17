@@ -85,20 +85,21 @@ class WoZController:
         self._utterance_candidates = dict()
         self._utterance_candidates_errors = dict()
 
-
         self._update_utterance_candidates_thread = None
         self._update_utterance_candidates_cond = threading.Condition()
 
-        # 対話ID
-        self._dialog_id = generate_dialog_id()
+        # 対話ID（実際のIDはstart_new_sessionメソッド内で作成）
+        self._dialog_id = None
 
-        # 各種ロガー
-        log_top_dir = self._config['Log']['dir']
-        self._control_logger = Logger(get_log_file_path(log_top_dir, self._dialog_id, "control.csv"))
-        self._control_logger_cond = threading.Condition()
-        self._asr_logger = Logger(get_log_file_path(log_top_dir, self._dialog_id, "asr.csv"))
-        self._asr_logger_cond = threading.Condition()
-        self._json_logger = JSONLogger(get_log_file_path(log_top_dir, self._dialog_id, "system.json"))
+        # 各種ロガー（実際のロガーはstart_new_sessionメソッド内で作成）
+        self._control_logger = None
+        self._asr_logger = None
+        self._json_logger = None
+        # ログに一貫性を持たせるための condition (mutex)
+        self._logger_cond = threading.Condition()
+
+        # 新規セッションを開始（ログの作成，履歴のクリアなど）
+        self.start_new_session()
 
         # 音声認識関係
         self._user_a = None
@@ -135,6 +136,33 @@ class WoZController:
     _interface_target_list = [
         "A", "B"
     ]
+
+    def start_new_session(self):
+        """新しいセッションを開始する"""
+        # 対話ID
+        self._dialog_id = generate_dialog_id()
+
+        # ログファイルの作成
+        with self._logger_cond:
+            if self._control_logger is not None:
+                self._control_logger.close()
+                self._asr_logger.close()
+                self._json_logger.close()
+
+            # 各種ロガー
+            log_top_dir = self._config['Log']['dir']
+            self._control_logger = Logger(get_log_file_path(log_top_dir, self._dialog_id, "control.csv"))
+            self._asr_logger = Logger(get_log_file_path(log_top_dir, self._dialog_id, "asr.csv"))
+            self._json_logger = JSONLogger(get_log_file_path(log_top_dir, self._dialog_id, "system.json"))
+        
+        # 発話候補のクリア
+        with self._update_utterance_candidates_cond:
+            self._utterance_candidates.clear()
+            self._utterance_candidates_errors.clear()
+
+            # ついでに同じタイミングで履歴もクリア
+            self._context_manager.clear()
+
 
     def update_utterance_candidates(self):
         """発話候補リストの更新を行う"""
@@ -204,7 +232,7 @@ class WoZController:
             success = True
         finally:
             # ログ保存
-            with self._control_logger_cond:
+            with self._logger_cond:
                 control_id = self._control_logger.get_new_id()
                 self._control_logger.put([control_id, dt, command, None, command_type, target, None, success])
 
@@ -242,7 +270,7 @@ class WoZController:
             print(traceback.format_exc())
         finally:
             # ログ保存
-            with self._control_logger_cond:
+            with self._logger_cond:
                 control_id = self._control_logger.get_new_id()
                 self._control_logger.put([control_id, dt, command, None, command_type, target, None, success])
 
@@ -278,8 +306,8 @@ class WoZController:
             self._sound_player.play(ut.speech_data)
             self._context_manager.append_executed_nlg_command(ut.nlg_command)
 
-            # 成功時の操作ログへの書き出し
-            with self._control_logger_cond:
+            with self._logger_cond:
+                # 成功時の操作ログへの書き出し
                 control_id = self._control_logger.get_new_id()            
                 self._control_logger.put([
                     control_id, 
@@ -289,8 +317,7 @@ class WoZController:
                     ut.nlg_command.query.command_type,
                     ut.nlg_command.query.target,
                     ut.text, True])
-            # 音声認識結果ログに書き出し
-            with self._asr_logger_cond:
+                # 音声認識結果ログに書き出し
                 time_start = datetime.datetime.now()
                 # 終了時間（予測） 
                 # TODO 音声波形の時間計算はここでやりたくない
@@ -307,19 +334,19 @@ class WoZController:
                 self._asr_logger.put([
                     asr_id, user_label, str_start, str_end, "0.0", content
                 ])
-            # システムログに書き出し
-            json_info = dict(
-                datetime=dt,
-                control_id=control_id,
-                asr_id=asr_id,
-                utterance_candidate=ut.get_json_log_info()
-            )
-            self._json_logger.put(json_info)
+                # システムログに書き出し
+                json_info = dict(
+                    datetime=dt,
+                    control_id=control_id,
+                    asr_id=asr_id,
+                    utterance_candidate=ut.get_json_log_info()
+                )
+                self._json_logger.put(json_info)
             # 次回の発話を生成する
             self.update_utterance_candidates()
         else:
             # 失敗時の操作ログへの書き出し
-            with self._control_logger_cond:
+            with self._logger_cond:
                 control_id = self._control_logger.get_new_id()
                 self._control_logger.put([control_id, dt, command, command_arg, command_type, target, None, False])
 
@@ -431,7 +458,7 @@ class WoZController:
             else:
                 offset_seconds = 0
 
-            with self._asr_logger_cond:
+            with self._logger_cond:
                 str_id = self._asr_logger.get_new_id()
                 str_start = start_dtime.isoformat() if start_dtime is not None else ""
                 str_end = result.dtime.isoformat()

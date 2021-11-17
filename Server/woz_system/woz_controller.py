@@ -285,7 +285,7 @@ class WoZController:
                 content = ut.text
 
                 self._asr_logger.put([
-                    str_id, user_label, str_start, str_end, content
+                    str_id, user_label, str_start, str_end, "0.0", content
                 ])
 
             # 次回の発話を生成する
@@ -391,14 +391,22 @@ class WoZController:
                 start_dtime = cache.dtime
             else:
                 start_dtime = None
-            
+
+            # オフセット取得
+            offset = self._user_manager_client.get_diff_time(user_name)
+            if offset is not None:
+                offset_seconds = offset[0].total_seconds()
+            else:
+                offset_seconds = 0
+
             with self._asr_logger_cond:
                 str_id = self._asr_logger.get_new_id()
                 str_start = start_dtime.isoformat() if start_dtime is not None else ""
                 str_end = result.dtime.isoformat()
+                str_offset = "{}".format(offset_seconds)
             
                 self._asr_logger.put([
-                    str_id, user_label, str_start, str_end, content
+                    str_id, user_label, str_start, str_end, str_offset, content
                 ])
             
             # TODO この後，言語処理 -> 発話候補更新の流れ

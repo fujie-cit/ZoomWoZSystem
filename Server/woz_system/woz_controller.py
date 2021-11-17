@@ -103,6 +103,9 @@ class WoZController:
         self._user_manager_client = UserManagerClient(self._config["UserManager"]["url"])
         self._user_manager_client.append_receiver(self._handle_speech_recognition_result)
 
+    def __del__(self):
+        print("WoZController destructor called")
+
     # インターフェース上のコマンドリスト
     _interface_command_list = [
         # # システム動作系(command_type: action)
@@ -309,6 +312,10 @@ class WoZController:
         return self._dialog_id
 
     # 音声認識関係
+    def get_user_list(self) -> List[str]:
+        """接続中のユーザ名のリストを取得する"""
+        return self._user_manager_client.get_user_name_list()
+    
     def get_user_a(self) -> str:
         """参加者Aのユーザ名を取得する．設定して無ければNone"""
         return self._user_a

@@ -87,10 +87,27 @@ class SpeechRecognitionApplication(WebSocketApplication):
                 del self.__username2client[old_user_name]
         current_client.user_name = user_name
         self.__username2client[user_name] = current_client
-        print("{} logged in @{}".format(user_name, current_client.address))        
+        print("{} logged in @{}".format(user_name, current_client.address))
+        self.send_user_name_list(broadcast=True)
 
-    def send_user_name_list(self):
-        pass
+    def send_user_name_list(self, broadcast=False):
+        """ユーザ名リスト送信
+        """
+        dtime = datetime.datetime.now().isoformat()
+        user_name_list = sorted(self.__username2client.keys())
+        message_to_send = json.dumps(dict(
+            message_type="SendUserNameList",
+            datetime=dtime,
+            user_name_list=user_name_list            
+        ))
+        print(message_to_send)
+        if not broadcast: 
+            current_client = self.ws.handler.active_client
+            current_client.ws.send(message_to_send)
+        else:
+            for client in self.ws.handler.server.clients.values():
+                client.ws.send(message_to_send)
+
 
     def send_speech_recognition_result(self, message: dict):
         """ユーザから送られてきた音声認識結果を適宜サーバ（Wizard）に送る
@@ -232,8 +249,13 @@ class SpeechRecognitionApplication(WebSocketApplication):
     """
 
     def on_close(self, reason):
-        print("Connection closed!")
-
+        current_client = self.ws.handler.active_client
+        print("on_close: {} closed".format(current_client.address))
+        user_name = getattr(current_client, 'user_name', None)
+        if user_name is None:
+            return
+        del self.__username2client[user_name]
+        print("{} logged out".format(user_name))
 
 @flask_app.route('/')
 def index():

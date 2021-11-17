@@ -36,12 +36,15 @@ def get_index_html_context() -> dict:
     movie_list = movie_list[:topic_history_length]
     person_list.extend(['None'] * topic_history_length)
     person_list = person_list[:topic_history_length]
+    message_dict = dict(movie_list=movie_list, person=person_list)
 
     # 対話ID関係
     dialog_id = woz_controller.get_dialog_id()
 
     # 音声認識関係
-    user_list = [] # tentative
+    user_list = woz_controller.get_user_list()
+    user_list.insert(0, "--")
+    print(user_list)
     user_a = woz_controller.get_user_a()
     user_a = "--" if user_a is None else user_a
     user_b = woz_controller.get_user_b()
@@ -50,6 +53,7 @@ def get_index_html_context() -> dict:
     return dict(
         movie_list=movie_list, 
         person=person_list,
+        message=message_dict,
         dialog_id=dialog_id,
         user_list=user_list,
         user_a=user_a,

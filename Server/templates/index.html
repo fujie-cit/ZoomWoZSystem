@@ -180,14 +180,12 @@
 					<span style="font-size: 20px;">参加者 A</span>
 					&emsp;
 					<form method="post" action="/update_user_a" style="display: inline">
-					<!--
-						<select>
+						<select name="user_name">
 							{% for user in user_list %}
 								<option value="{{user}}" {{'selected' if user_a == user else ''}}>{{user}}</option>
 							{% endfor %}
 						</select>
-					-->
-					<input type="text" name="user_name" value="{{ '' if user_a == '--' else user_a }}"></input>
+					<!-- <input type="text" name="user_name" value="{{ '' if user_a == '--' else user_a }}"></input> -->
 					<input type="submit" value="設定" class="buttonM">
 					</form>
 				</td></tr>
@@ -289,14 +287,12 @@
 				<span style="font-size: 20px;">参加者 B</span>
 				&emsp;
 				<form method="post" action="/update_user_b" style="display: inline">
-					<!-- 
-					<select>
+					<select name="user_name">
 						{% for user in user_list %}
 							<option value="{{user}}" {{'selected' if user_b == user else ''}}>{{user}}</option>
 						{% endfor %}
 					</select>
-				    -->
-				<input type="text" name="user_name" value="{{ '' if user_b == '--' else user_b }}"></input>
+				<!-- <input type="text" name="user_name" value="{{ '' if user_b == '--' else user_b }}"></input> -->
 				<input type="submit" value="設定" class="buttonM">
 				</form>
 		    </td></tr>

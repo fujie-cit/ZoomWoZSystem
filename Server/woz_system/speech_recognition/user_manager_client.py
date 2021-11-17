@@ -96,6 +96,7 @@ class UserManagerClient:
 
         self._receiver_list = [] # type: List[SpeechRecognitionResult]
         
+        self._user_name_list = [] # ユーザ名のリスト
         self._diff_time_dict = {} # ユーザ名 -> 誤差時間
 
         # アプリをバックグラウンドで動かすためのスレッド
@@ -107,13 +108,28 @@ class UserManagerClient:
         with self._cond:
             while not self._opened and not self._closed:
                 self._cond.wait()
-
+        
+        # 最初にユーザリストを更新する
+        self.request_send_user_name_list()
 
     def append_receiver(self, receiver: Callable[[SpeechRecognitionResult], None]):
+        """音声認識結果取得時のハンドラを追加する．
+
+        Args:
+            receiver (Callable[[SpeechRecognitionResult], None]): [description]
+        """
         if receiver in self._receiver_list:
             return
-        self._receiver_list.append(receiver)
+        with self._cond:
+            self._receiver_list.append(receiver)
 
+    def request_send_user_name_list(self):
+        """ユーザ名リスト送信要求を出す"""
+        message = json.dumps(dict(
+            message_type="RequestSendUserNameList",
+            datetime=datetime.datetime.now().isoformat(),
+        ))
+        self._websocket_app.send(message)
 
     def request_start_send_speech_recognition_result(self, user_name: str):
         """音声認識結果送信開始要求を送る
@@ -128,7 +144,7 @@ class UserManagerClient:
             user_name=user_name
         ))
         self._websocket_app.send(message)
-
+    
     
     def request_stop_send_speech_recognition_result(self, user_name: str):
         """音声認識結果送信停止要求を送る
@@ -152,6 +168,12 @@ class UserManagerClient:
             user_name=user_name
         ))
         self._websocket_app.send(message)
+    
+    def get_user_name_list(self):
+        r = []
+        with self._cond:
+            r.extend(self._user_name_list)
+            return r
 
     def _on_message(self, ws, message):
         """メッセージを受信したときに呼び出されるコールバック関数．
@@ -161,19 +183,47 @@ class UserManagerClient:
             message (str): 受信したメッセージ（文字列）
         """
         message = json.loads(message)
+
+        # DEBUG
+        pprint(message)
+
         if message['message_type'] == 'SendSpeechRecognitionResult':
             nowstr = datetime.datetime.now().isoformat()
             # print("Speech Recognition Result " + nowstr)
             # pprint(message, compact=False)
 
-            result = SpeechRecognitionResult(
-                message['datetime'], message['user_name'], 
-                message['speech_recognition_state'], 
-                message['speech_recognition_result'])
-            for receiver in self._receiver_list:
-                receiver(result)
+        elif message['message_type'] == 'SendUserNameList':
+            self.handle_send_user_name_list(message)
         elif message['message_type'] == 'Pong':
             self.handle_pong(message)
+
+    def handle_send_speech_recognition_result(self, message: dict):
+        """音声認識結果受信時の処理
+
+        Args:
+            message (dict): 受信したメッセージ
+        """
+        result = SpeechRecognitionResult(
+            message['datetime'], message['user_name'], 
+            message['speech_recognition_state'], 
+            message['speech_recognition_result'])
+        
+        with self._cond:
+            current_receiver_list = self._receiver_list[:]
+        
+        for receiver in current_receiver_list:
+            receiver(result)
+
+    def handle_send_user_name_list(self, message: dict):
+        """ユーザ名リストの更新
+
+        Args:
+            message (dict): ユーザ名リストを含むメッセージ
+        """
+        new_user_name_list = message["user_name_list"]
+        with self._cond:
+            self._user_name_list.clear()
+            self._user_name_list.extend(new_user_name_list)
 
     def handle_pong(self, message: dict):
         """Pongを処理して，時差情報を更新

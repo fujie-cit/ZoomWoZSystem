@@ -3,7 +3,7 @@ __editor__ = "Jin Sakuma"
 from flask import Flask, render_template, request
 from werkzeug.utils import get_content_type
 # from robot_controller import RobotController
-from woz_system.woz_controller import WoZController 
+from woz_system.woz_controller import WoZController
 import sys
 # import logging
 # import logging.handlers
@@ -27,6 +27,7 @@ app = Flask(__name__)
 topic_history_length = 6
 woz_controller = WoZController()
 
+
 def get_index_html_context() -> dict:
     """index.htmlをレンダリングするために必要なコンテキストを取得する"""
 
@@ -49,20 +50,20 @@ def get_index_html_context() -> dict:
     user_b = woz_controller.get_user_b()
     user_b = "--" if user_b is None else user_b
 
-    return dict(
-        movie_list=movie_list, 
-        person=person_list,
-        message=message_dict,
-        dialog_id=dialog_id,
-        user_list=user_list,
-        user_a=user_a,
-        user_b=user_b
-    )
+    return dict(movie_list=movie_list,
+                person=person_list,
+                message=message_dict,
+                dialog_id=dialog_id,
+                user_list=user_list,
+                user_a=user_a,
+                user_b=user_b)
+
 
 @app.route('/')
 def index():
     context = get_index_html_context()
     return render_template('index.html', **context)
+
 
 @app.route('/update_session')
 def update_session():
@@ -71,14 +72,16 @@ def update_session():
     context = get_index_html_context()
     return render_template('index.html', **context)
 
+
 @app.route('/update_user_a', methods=['POST'])
 def update_user_a():
     if "user_name" in request.form:
         user_name = request.form["user_name"]
         woz_controller.set_user_a(user_name)
-    
+
     context = get_index_html_context()
     return render_template('index.html', **context)
+
 
 @app.route('/update_user_b', methods=['POST'])
 def update_user_b():
@@ -88,10 +91,11 @@ def update_user_b():
     context = get_index_html_context()
     return render_template('index.html', **context)
 
+
 @app.route('/send/<command>/<detail>', methods=['POST'])
 def push_button(command, detail):
     debug_message = None
-    try: 
+    try:
         woz_controller.execute(command, detail)
     except Exception as e:
         debug_message = traceback.format_exc()
@@ -99,8 +103,9 @@ def push_button(command, detail):
 
     context = get_index_html_context()
     if debug_message:
-        context['debug_message'] = '<pre>' + debug_message  + '</pre>'
+        context['debug_message'] = '<pre>' + debug_message + '</pre>'
     return render_template('index.html', **context)
+
 
 if __name__ == '__main__':
     app.run(debug=False, host=host, port=port, threaded=True)

@@ -1,0 +1,43 @@
+<!doctype html>
+<head>
+    <meta charset="utf-8"/>
+    <title>対話データ収集用 音声ストリーミングプログラム</title>
+    <style>
+    </style>
+    <script type=text/javascript>
+        $SCRIPT_ROOT =
+        {{ request.script_root|tojson|safe }}
+    </script>
+</head>
+<body>
+<h2>対話データ収集用 音声認識 プログラム音声ストリーミングプログラム</h2>
+
+<div>
+    <ul>
+        <li>MediaRecorderでマイクから録音しながらサーバにストリーミングします</li>
+        <li>音声データはWebMエンコードのバイナリデータをbase64エンコードしたテキストメッセージで送ります</li>
+        <li>サーバ側では受け取ったパケットをFFmpegで逐次WAV（16bit/16kHz）に変換して書き出します</li>
+        <li>ローカルサーバで動作させた場合は，60ms周期で処理ができることを確認しています</li>
+    </ul>
+</div>
+
+<h2>実行</h2>
+<div>
+    下記の開始ボタンを押すと，ストリーミングが開始されます．<br/>
+    <button id="start" style="font-size: 14pt;">開始</button>
+    <button id="stop" style="font-size: 14pt;">停止</button>
+</div>
+
+<h2>デバッグメッセージ</h2>
+<div>
+    <ul style="list-style-type: none;" id="messages">
+        <li>ここにデバッグメッセージが表示されます.</li>
+    </ul>
+</div>
+
+</body>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+<script src="{{ url_for('static', filename='js/media.js') }}"></script>
+</html>
